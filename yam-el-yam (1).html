@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ים אל ים">
+<title>ים אל ים — יומן טיול</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700;900&family=Heebo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#2B3A2E;
+    --paper:#F6F1E4;
+    --paper-2:#EEE6D2;
+    --olive:#4A5A3C;
+    --olive-dk:#33402A;
+    --clay:#B5602E;
+    --clay-lt:#E8B98C;
+    --dusk:#3C4A5C;
+    --line:#D9CCA8;
+    --today:#B5602E;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Heebo',sans-serif;
+    min-height:100vh;
+    padding-bottom:90px;
+  }
+  h1,h2,h3,.disp{font-family:'Frank Ruhl Libre',serif;}
+
+  /* HEADER */
+  header{
+    background:linear-gradient(160deg,var(--olive-dk),var(--olive) 60%,var(--clay) 130%);
+    color:var(--paper);
+    padding:26px 20px 34px;
+    position:relative;
+    overflow:hidden;
+  }
+  header::after{
+    content:"";
+    position:absolute; inset:0;
+    background-image:
+      radial-gradient(circle at 85% 15%, rgba(246,241,228,0.12), transparent 40%),
+      repeating-linear-gradient(115deg, rgba(246,241,228,0.05) 0 2px, transparent 2px 18px);
+    pointer-events:none;
+  }
+  .eyebrow{
+    font-size:12px; letter-spacing:.14em; opacity:.8; font-weight:600;
+    text-transform:uppercase;
+  }
+  header h1{
+    font-size:34px; margin:6px 0 4px; font-weight:900; line-height:1.1;
+  }
+  .subline{font-size:14px; opacity:.9;}
+  .today-pill{
+    display:inline-flex; align-items:center; gap:6px;
+    background:rgba(246,241,228,0.16);
+    border:1px solid rgba(246,241,228,0.35);
+    border-radius:999px;
+    padding:6px 14px;
+    font-size:13px;
+    margin-top:14px;
+    backdrop-filter:blur(2px);
+  }
+  .today-pill b{font-family:'Frank Ruhl Libre',serif; font-size:14px;}
+  .lodging-shortcut{
+    display:flex; align-items:center; justify-content:space-between;
+    background:rgba(20,20,15,0.22);
+    border:1px dashed rgba(246,241,228,0.45);
+    border-radius:12px;
+    padding:10px 14px;
+    margin-top:10px;
+    font-size:13px; font-weight:600;
+    color:var(--paper);
+    text-decoration:none;
+  }
+  .lodging-shortcut #lodgingShortcutStatus{color:var(--clay-lt); font-weight:700;}
+  .crew-photo{
+    position:absolute; top:20px; left:20px;
+    width:86px; height:86px; border-radius:50%;
+    border:3px solid rgba(246,241,228,0.85);
+    box-shadow:0 4px 16px rgba(0,0,0,0.38);
+    object-fit:cover; z-index:2;
+  }
+
+  /* NAV TABS */
+  nav{
+    position:sticky; top:0; z-index:20;
+    display:flex;
+    background:var(--paper);
+    border-bottom:1px solid var(--line);
+    box-shadow:0 2px 10px rgba(43,58,46,0.06);
+  }
+  nav button{
+    flex:1; padding:13px 4px; background:none; border:none;
+    font-family:'Heebo',sans-serif; font-size:13px; font-weight:600;
+    color:#8A8368; cursor:pointer; border-bottom:3px solid transparent;
+    transition:.15s;
+  }
+  nav button.active{color:var(--olive-dk); border-bottom-color:var(--clay);}
+
+  main{padding:18px 16px 8px; max-width:640px; margin:0 auto;}
+  .view{display:none;}
+  .view.active{display:block; animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+  /* DAY CARDS */
+  .day-card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:16px;
+    margin-bottom:16px;
+    overflow:hidden;
+    position:relative;
+  }
+  .day-card.is-today{
+    border:3px solid var(--clay);
+    box-shadow:0 10px 28px rgba(181,96,46,0.28);
+    transform:scale(1.015);
+  }
+  .day-card.is-today .day-head{
+    background:linear-gradient(135deg, var(--clay-lt) 0%, var(--paper-2) 65%);
+  }
+  .day-card.is-today .day-title{
+    font-weight:900;
+    color:var(--olive-dk);
+  }
+  .day-card.is-today .day-num{
+    color:var(--clay);
+  }
+  .day-head{
+    display:flex; justify-content:space-between; align-items:flex-start;
+    padding:16px 16px 10px;
+    background:var(--paper-2);
+  }
+  .day-num{
+    font-size:11px; font-weight:700; letter-spacing:.08em;
+    color:var(--olive-dk); text-transform:uppercase;
+  }
+  .day-title{font-size:19px; font-weight:700; margin-top:2px;}
+  .day-date{font-size:12px; color:#7A745C; margin-top:2px;}
+  .today-badge{
+    background:var(--clay); color:#fff; font-size:12.5px; font-weight:900;
+    padding:6px 14px; border-radius:999px; white-space:nowrap;
+    letter-spacing:.02em;
+    box-shadow:0 3px 10px rgba(181,96,46,0.45);
+    animation:pulseBadge 2s ease-in-out infinite;
+  }
+  @keyframes pulseBadge{
+    0%,100%{ box-shadow:0 3px 10px rgba(181,96,46,0.45); }
+    50%{ box-shadow:0 3px 16px rgba(181,96,46,0.75); }
+  }
+  .stats-row{
+    display:flex; gap:0; padding:12px 16px; border-bottom:1px solid var(--line);
+  }
+  .stat{flex:1; text-align:center;}
+  .stat b{display:block; font-family:'Frank Ruhl Libre',serif; font-size:18px; color:var(--olive-dk);}
+  .stat span{font-size:10.5px; color:#8A8368;}
+  .day-body{padding:14px 16px 16px;}
+  .day-body p{font-size:14px; line-height:1.65; margin:0 0 12px; color:#3D3B2E;}
+  .day-links{display:flex; gap:8px; flex-wrap:wrap;}
+  .pill-link{
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:12.5px; font-weight:600;
+    padding:8px 13px; border-radius:10px;
+    text-decoration:none;
+    border:1px solid var(--line);
+    color:var(--olive-dk);
+    background:var(--paper);
+  }
+  .pill-link.gmaps{background:#3C4A5C; color:#fff; border-color:#3C4A5C;}
+  .pill-link.mapeak{background:var(--olive); color:#fff; border-color:var(--olive);}
+  button.pill-link{font-family:'Heebo',sans-serif; cursor:pointer;}
+  .pill-link.ics-btn{background:#5A4A8A; color:#fff; border-color:#5A4A8A;}
+
+  /* SECTION LABELS */
+  .sec-label{
+    font-size:12px; font-weight:700; color:var(--clay); text-transform:uppercase;
+    letter-spacing:.08em; margin:22px 0 10px 2px;
+  }
+  .sec-label:first-child{margin-top:2px;}
+
+  /* GEAR */
+  .gear-cat{
+    background:#fff; border:1px solid var(--line); border-radius:14px;
+    margin-bottom:12px; overflow:hidden;
+  }
+  .gear-cat summary{
+    padding:13px 16px; font-weight:700; font-size:14.5px; cursor:pointer;
+    display:flex; justify-content:space-between; align-items:center;
+    background:var(--paper-2); list-style:none;
+  }
+  .gear-cat summary::-webkit-details-marker{display:none;}
+  .gear-cat summary .count{font-size:11.5px; font-weight:500; color:#8A8368;}
+  .gear-cat[open] summary{border-bottom:1px solid var(--line);}
+  .gear-item{
+    display:flex; align-items:center; gap:10px;
+    padding:11px 16px; border-bottom:1px solid #F1EBD9; font-size:14px;
+  }
+  .gear-item:last-child{border-bottom:none;}
+  .gear-item input[type=checkbox]{
+    width:20px; height:20px; accent-color:var(--olive); flex-shrink:0;
+  }
+  .gear-item label.checked{text-decoration:line-through; color:#A39C82;}
+  .gear-progress{
+    font-size:12px; color:#8A8368; padding:0 2px 10px; text-align:left;
+  }
+
+  /* TRANSPORT */
+  .contact-card{
+    background:linear-gradient(145deg,#20211F,#2E2C28);
+    color:#F2EFE6; border-radius:18px; padding:22px 20px; text-align:center;
+    margin-bottom:16px;
+  }
+  .contact-card .badge{
+    display:inline-block; border:1px solid #8A835E; border-radius:999px;
+    font-size:10.5px; letter-spacing:.1em; padding:4px 12px; margin-bottom:10px; color:#C9BE8F;
+  }
+  .contact-card h2{font-size:22px; margin:0 0 4px;}
+  .contact-card .sub{font-size:12.5px; color:#B7B29A; margin-bottom:18px;}
+  .call-btn{
+    display:block; background:var(--clay); color:#fff; text-decoration:none;
+    font-weight:700; font-size:17px; padding:14px; border-radius:12px; margin-bottom:10px;
+    letter-spacing:.03em;
+  }
+  .call-btn.secondary{background:transparent; border:1px solid #5A5744; color:#F2EFE6;}
+  .info-box{
+    background:#fff; border:1px solid var(--line); border-radius:14px; padding:16px;
+    font-size:13.5px; line-height:1.7; color:#4A4738;
+  }
+
+  /* LINKS TAB */
+  .link-item{
+    display:flex; align-items:center; gap:12px;
+    background:#fff; border:1px solid var(--line); border-radius:14px;
+    padding:14px 16px; margin-bottom:10px; text-decoration:none; color:var(--ink);
+  }
+  .link-item .ico{
+    width:38px; height:38px; border-radius:10px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; font-size:17px;
+    background:var(--paper-2);
+  }
+  .link-item .txt b{display:block; font-size:14px;}
+  .link-item .txt span{font-size:12px; color:#8A8368;}
+
+  .before-list{background:#fff; border:1px solid var(--line); border-radius:14px; padding:6px 16px;}
+
+  /* LODGING */
+  .tbd-banner{
+    background:#FBEFDE; border:1px solid #E7CDA0; color:#8A5A1E;
+    border-radius:12px; padding:10px 14px; font-size:12.5px; line-height:1.6;
+    margin-bottom:16px;
+  }
+  .night-card{
+    background:#fff; border:1px solid var(--line); border-radius:16px;
+    margin-bottom:16px; overflow:hidden;
+  }
+  .night-head{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:14px 16px; background:var(--paper-2);
+  }
+  .night-head .nt{font-size:11px; font-weight:700; color:var(--olive-dk); text-transform:uppercase; letter-spacing:.06em;}
+  .night-head .nt-sub{font-size:12px; color:#7A745C; margin-top:2px;}
+  .status-tag{font-size:10.5px; font-weight:700; padding:4px 10px; border-radius:999px;}
+  .status-tag.tbd{background:#FBEFDE; color:#8A5A1E;}
+  .status-tag.confirmed{background:#DCEAD4; color:#3A6B2E;}
+  .night-body{padding:14px 16px;}
+  .field-row{margin-bottom:12px;}
+  .field-row:last-child{margin-bottom:0;}
+  .field-label{font-size:11px; color:#8A8368; font-weight:700; margin-bottom:5px; display:block;}
+  .field-editable{
+    border:1px solid var(--line); border-radius:10px; padding:10px 12px;
+    font-size:14px; font-family:'Heebo',sans-serif; background:var(--paper);
+    min-height:20px; outline:none; color:var(--ink);
+  }
+  .field-editable:empty::before{content:attr(data-placeholder); color:#A39C82;}
+  .field-editable:focus{border-color:var(--clay); background:#fff;}
+  .night-actions{display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;}
+  .saved-flash{font-size:11px; color:var(--olive); opacity:0; transition:opacity .3s;}
+  .saved-flash.show{opacity:1;}
+
+  /* SOS FAB + PANEL */
+  .sos-fab{
+    position:fixed; bottom:22px; left:16px; z-index:40;
+    width:56px; height:56px; border-radius:50%;
+    background:#B23B2E; color:#fff; border:none;
+    font-size:22px; box-shadow:0 6px 18px rgba(178,59,46,0.5);
+    cursor:pointer;
+  }
+  .sos-panel{
+    position:fixed; bottom:0; left:0; right:0; z-index:50;
+    background:#fff; border-radius:20px 20px 0 0;
+    box-shadow:0 -8px 30px rgba(0,0,0,0.25);
+    padding:18px 18px 26px;
+    transform:translateY(110%);
+    transition:transform .3s ease;
+    max-width:640px; margin:0 auto;
+  }
+  .sos-panel.open{transform:translateY(0);}
+  .sos-panel-head{
+    display:flex; justify-content:space-between; align-items:center;
+    font-family:'Frank Ruhl Libre',serif; font-size:19px; font-weight:700;
+    margin-bottom:12px; color:var(--ink);
+  }
+  .sos-close{
+    background:var(--paper-2); border:none; border-radius:50%;
+    width:30px; height:30px; font-size:15px; cursor:pointer; color:var(--ink);
+  }
+  .sos-item{
+    display:flex; align-items:baseline; gap:10px;
+    padding:12px 4px; border-bottom:1px solid var(--line);
+    text-decoration:none; color:var(--ink);
+  }
+  .sos-item:last-of-type{border-bottom:none;}
+  .sos-item b{font-family:'Frank Ruhl Libre',serif; font-size:20px; color:#B23B2E; min-width:56px;}
+  .sos-item span{font-size:13px; color:#4A4738;}
+  .sos-note{font-size:11.5px; color:#8A8368; margin-top:10px; line-height:1.6;}
+  .sos-overlay{
+    position:fixed; inset:0; background:rgba(20,18,14,0.4); z-index:45;
+    opacity:0; pointer-events:none; transition:opacity .3s;
+  }
+  .sos-overlay.open{opacity:1; pointer-events:auto;}
+
+  /* SUNSET WARNING BANNER (inside day card) */
+  .sunset-warning{
+    background:#3C2A22; color:#F3D9BE;
+    border-radius:12px; padding:12px 14px; margin-bottom:12px;
+    font-size:13px; line-height:1.6;
+    border:1px solid #6B4A34;
+  }
+  .sunset-warning b{color:#FFB37A;}
+
+  footer{text-align:center; font-size:11px; color:#A39C82; padding:22px 20px 10px;}
+</style>
+</head>
+<body>
+
+<header>
+  <img class="crew-photo" src="data:image/jpeg;base64,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" alt="החברים בטיול">
+  <div class="eyebrow">גליל עליון · הרי מירון</div>
+  <h1>ים אל ים</h1>
+  <div class="subline">עבדון ← אבירים ← הר מירון ← נחל עמוד ← כנרת · 4 ימים</div>
+  <div class="today-pill" id="todayPill">טוען תאריך…</div>
+  <a href="#" class="lodging-shortcut" id="lodgingShortcut">🛏️ מקומות לינה — <span id="lodgingShortcutStatus">טרם נקבע</span> ›</a>
+</header>
+
+<nav>
+  <button data-view="route" class="active">מסלול</button>
+  <button data-view="lodging">לינה</button>
+  <button data-view="gear">ציוד</button>
+  <button data-view="transport">הסעה</button>
+  <button data-view="links">קישורים</button>
+</nav>
+
+<main>
+
+  <!-- ROUTE VIEW -->
+  <section id="route" class="view active"></section>
+
+  <!-- LODGING VIEW -->
+  <section id="lodging" class="view">
+    <div class="tbd-banner">⚠️ מקומות הלינה עדיין <b>לא סופיים</b>. השדות ניתנים לעריכה על ידי כל אחד בקבוצה ומתעדכנים לכולם — מי שסוגר מקום, שיעדכן כאן ישר.</div>
+    <div id="nightsCats"></div>
+  </section>
+
+  <!-- GEAR VIEW -->
+  <section id="gear" class="view">
+    <div class="sec-label">רשימת ציוד — ים אל ים</div>
+    <div id="gearProgress" class="gear-progress"></div>
+    <div id="gearCats"></div>
+
+    <div class="sec-label">לפני היציאה</div>
+    <div class="before-list" id="beforeList"></div>
+  </section>
+
+  <!-- TRANSPORT VIEW -->
+  <section id="transport" class="view">
+    <div class="contact-card">
+      <div class="badge">V.I.P LUXURY CAR SERVICE</div>
+      <h2>Alex Premium Transportation</h2>
+      <div class="sub">הסעות ותיירות · פעיל 24 שעות</div>
+      <a class="call-btn" href="tel:+972538898830">📞 חיוג — 053-889-8830</a>
+      <a class="call-btn secondary" href="https://wa.me/972538898830" target="_blank">WhatsApp</a>
+    </div>
+    <div class="info-box">
+      <b>למה זה כאן:</b> הסעה לנקודת הזינוק (צומת עבדון) ו/או איסוף מנחל עמוד תחתון או מהכנרת בסיום. מומלץ לתאם מראש יום־יומיים לפני, במיוחד לימי סוף שבוע.
+    </div>
+  </section>
+
+  <!-- LINKS VIEW -->
+  <section id="links" class="view">
+    <div class="sec-label">ניווט למוצא הטיול</div>
+    <a class="link-item" target="_blank" href="https://www.google.com/maps/dir/?api=1&destination=%D7%A6%D7%95%D7%9E%D7%AA+%D7%A2%D7%91%D7%93%D7%95%D7%9F&travelmode=driving">
+      <div class="ico">🚗</div>
+      <div class="txt"><b>ניווט לצומת עבדון</b><span>נקודת הזינוק של יום 1 — Google Maps</span></div>
+    </a>
+
+    <div class="sec-label">הגעה בתחבורה ציבורית</div>
+    <div class="info-box" style="margin-bottom:10px;">
+      <b>אופציה זולה לצומת עבדון</b> (לפי דיווח מטייל קודם באותו מסלול):<br>
+      🚆 רכבת ~06:30 מתל אביב לנהריה<br>
+      🚌 קו 37 ~09:00 מנהריה לצומת עבדון<br>
+      <span style="color:#8A8368; font-size:12px;">⚠️ שעות משוערות בלבד — לבדוק לוח זמנים מעודכן קרוב לתאריך, זה עלול להשתנות בסופ״ש/חג.</span>
+    </div>
+    <a class="link-item" target="_blank" href="https://www.rail.co.il/">
+      <div class="ico">🚆</div>
+      <div class="txt"><b>לוח זמנים — רכבת ישראל</b><span>ת״א ← נהריה</span></div>
+    </a>
+    <a class="link-item" target="_blank" href="https://www.bus.co.il/">
+      <div class="ico">🚌</div>
+      <div class="txt"><b>לוח זמנים — קו 37 מנהריה</b><span>נהריה ← צומת עבדון</span></div>
+    </a>
+
+    <div class="sec-label">מזג אוויר</div>
+    <a class="link-item" target="_blank" href="https://ims.gov.il/he/forecast_data/%D7%A6%D7%A4%D7%AA">
+      <div class="ico">🌤️</div>
+      <div class="txt"><b>תחזית — השירות המטאורולוגי</b><span>אזור צפת / הרי מירון · תחזית אמינה רק מ-10 ימים לפני</span></div>
+    </a>
+    <a class="link-item" target="_blank" href="https://www.windy.com/32.965/35.496?32.965,35.496,10">
+      <div class="ico">🌬️</div>
+      <div class="txt"><b>Windy — תחזית מפורטת</b><span>רוח, גשם וטמפרטורה לפי שעה</span></div>
+    </a>
+
+    <div class="sec-label">מפות מסלול מלאות (mapeak)</div>
+    <a class="link-item" target="_blank" href="https://mapeak.com/share/3iVNZQ4Lrz">
+      <div class="ico">🥾</div>
+      <div class="txt"><b>יום 1 — נחל כזיב לאבירים</b><span>מסלול GPX מלא לניווט בשטח</span></div>
+    </a>
+    <a class="link-item" target="_blank" href="https://mapeak.com/share/4VFTh6CVoE">
+      <div class="ico">🥾</div>
+      <div class="txt"><b>יום 2 — אבירים לחורבת חממה</b><span>מסלול GPX מלא לניווט בשטח</span></div>
+    </a>
+    <a class="link-item" target="_blank" href="https://mapeak.com/share/3skCtwuMOf">
+      <div class="ico">🥾</div>
+      <div class="txt"><b>יום 3 — חורבת חממה לעין כובס</b><span>מסלול GPX מלא לניווט בשטח</span></div>
+    </a>
+    <a class="link-item" target="_blank" href="https://mapeak.com/share/kJt9iIeVr1">
+      <div class="ico">🥾</div>
+      <div class="txt"><b>יום 4 — עין כובס לכנרת</b><span>מסלול GPX מלא לניווט בשטח</span></div>
+    </a>
+
+    <div class="sec-label">כלים נוספים</div>
+    <a class="link-item" target="_blank" href="https://israelhiking.osm.org.il/">
+      <div class="ico">🗺️</div>
+      <div class="txt"><b>Israel Hiking Map</b><span>מומלץ מנוי פרימיום להורדת מפות אופליין</span></div>
+    </a>
+    <a class="link-item" target="_blank" href="https://www.sipurderech.co.il/%D7%99%D7%A9%D7%A8%D7%90%D7%9C/%D7%99%D7%9D-%D7%90%D7%9C-%D7%99%D7%9D-%D7%A1%D7%95%D7%9C%D7%95-%D7%91%D7%90%D7%A8%D7%91%D7%A2%D7%94-%D7%99%D7%9E%D7%99%D7%9D">
+      <div class="ico">📖</div>
+      <div class="txt"><b>יומן הטיול המקורי</b><span>סיפור דרך — דיווח מלא עם תמונות</span></div>
+    </a>
+  </section>
+
+</main>
+
+<!-- EMERGENCY FLOATING BUTTON -->
+<div id="sosOverlay" class="sos-overlay"></div>
+<button id="sosBtn" class="sos-fab">🆘</button>
+<div id="sosPanel" class="sos-panel">
+  <div class="sos-panel-head">
+    <span>מספרי חירום</span>
+    <button id="sosClose" class="sos-close">✕</button>
+  </div>
+  <a class="sos-item" href="tel:100"><b>100</b><span>משטרה — כולל תיאום חילוץ בשטח</span></a>
+  <a class="sos-item" href="tel:101"><b>101</b><span>מד״א — אמבולנס / חירום רפואי</span></a>
+  <a class="sos-item" href="tel:102"><b>102</b><span>כבאות והצלה</span></a>
+  <a class="sos-item" href="tel:*3639"><b>3639*</b><span>מוקד רט״ג (מידע על שטחים פתוחים, א׳-ה׳ 8:00-16:00)</span></a>
+  <div class="sos-note">במקרה חירום אמיתי — קודם כל 100 או 101. שתפו את המיקום המדויק שלכם אם יש קליטה.</div>
+</div>
+
+<footer>נבנה עבור קבוצת הטיול · הנתונים בטאבים "ציוד" ו"לינה" משותפים לכולם</footer>
+
+<script>
+/* ---------- TRIP DATA ---------- */
+const TRIP_START = new Date(2026, 10, 12); // 12 Nov 2026 (months 0-indexed)
+
+function gmapsDir(origin, destination){
+  return "https://www.google.com/maps/dir/?api=1&origin="+encodeURIComponent(origin)+"&destination="+encodeURIComponent(destination)+"&travelmode=walking";
+}
+
+const days = [
+  {
+    n:1, from:"עבדון", to:"אבירים",
+    date:new Date(2026,10,12), dateLabel:"חמישי, 12.11",
+    dist:"13.3 ק״מ", up:"522 מ׳", down:"56 מ׳",
+    text:"מתחילים בחיבור נחל כזיב לכביש 8913. אחרי כ-1 ק״מ נקודת מילוי מים ועין חרדלית — יפה אך פופולרי, כדאי לא להתעכב אם עמוס. סימון ירוק ברור. בהמשך נראה מבצר מונפורט מלמטה, ואז בריכת הדלבים ועין טמיר — מקומות מרהיבים שנוטים להיות מלאים; אפשר לחפש בריכה שקטה יותר בדרך אליהם. לפני העלייה לאבירים יש פיצול שבילים בין הסימון הירוק לשחור — לשים לב לא לפספס. העלייה עצמה תלולה אך קצרה. החניון קטן ולא מסומן היטב — לחפש את פח הצפרדע הגדול. יש ברז מים ופח.",
+    mapeak:"https://mapeak.com/share/3iVNZQ4Lrz",
+    gmaps:gmapsDir("צומת עבדון","אבירים")
+  },
+  {
+    n:2, from:"אבירים", to:"חורבת חממה (הר מירון)",
+    date:new Date(2026,10,13), dateLabel:"שישי, 13.11",
+    dist:"19.2 ק״מ", up:"624 מ׳", down:"288 מ׳",
+    text:"היום הארוך ביותר. יציאה בסימון אדום שלא תמיד ברור בשטח, ואז מעבר לירוק דרך שמורת אבירים — קטע נעים עם פריחה. ברכת פסוטה לא מרשימה במיוחד, ורבים מקצרים דרך הכביש. לאחר חציית כביש ומגרש גרוטאות ממשיכים לאורך נחל זווית עד גשר אלקוש (כ-10 ק״מ) — נקודת עצירה טובה, יש שם תחנת דלק מינימלית. מכאן נכנסים לשמורת הר מירון — קטע יפהפה, וההיילייט הוא עין חותם כ-3.5 ק״מ מהגשר. אחריו מעבר לסימון אדום ועלייה אחרונה תלולה (כ-5.5 ק״מ) לאורך נחל נריה עד לחניון. החניון גדול מאוד, יש ברז מים אך אין פח — לרדת עם האשפה.",
+    mapeak:"https://mapeak.com/share/4VFTh6CVoE",
+    gmaps:gmapsDir("אבירים","חורבת חממה, הר מירון")
+  },
+  {
+    n:3, from:"חורבת חממה", to:"נחל עמוד תחתון",
+    date:new Date(2026,10,14), dateLabel:"שבת, 14.11",
+    dist:"23.1 ק״מ", up:"340 מ׳", down:"1180 מ׳",
+    sunsetWarning:"שקיעה בסביבות <b>16:40</b> (יש לוודא תחזית מדויקת סמוך לתאריך). הקטע הטכני שלפני עין כובס (בולדרים, יתדות, סולם) מסוכן בחושך — לצאת מוקדם ככל האפשר, ולשקול מראש לדלג על עין כובס ולהמשיך ישר לנחל עמוד תחתון אם מתעכבים.",
+    text:"היום הארוך והמאתגר מבחינה טכנית. מתחברים לשביל ישראל ועולים להר נריה — מצפור עם נוף לחרמון, מומלץ לעצור. המשך על כתף הר מירון לשלושה מצפורים וחניון הפסגה (מילוי מים). בסביבות ק״מ 7 חורשת ה-44 (אנדרטת שריפת הכרמל). ירידה לפיתול מירון ומשם לבריכות נחל מירון ובריכות שכווי — יפות אך ההליכה ביניהן איטית וטכנית (זיגזג לאורך הנחל). הקטע שלפני עין כובס מוגדר רשמית כ'מאתגר וממושך' — כולל בולדרים, יתדות וסולם; חשוב לתכנן זמן כך שלא תגיעו אליו בשעות החשכה. אפשרות: לדלג על עין כובס ולהמשיך ישר לנחל עמוד תחתון (כמו במסלול המקורי בטבלה). חניון גדול, יש ברזי מים ומקום למדורה.",
+    mapeak:"https://mapeak.com/share/3skCtwuMOf",
+    gmaps:gmapsDir("חורבת חממה","חניון נחל עמוד תחתון")
+  },
+  {
+    n:4, from:"נחל עמוד תחתון", to:"כנרת",
+    date:new Date(2026,10,15), dateLabel:"ראשון, 15.11",
+    dist:"9 ק״מ", up:"53 מ׳", down:"287 מ׳",
+    text:"הקטע הקצר והקל של הטיול. ממשיכים על שביל ישראל, ללא מים זורמים בנחל, הליכה על אבנים ובין קוצים. אחרי כ-6 ק״מ מגיעים לעמוד המפורסם שעל שמו קרוי הנחל. הקילומטרים האחרונים הם הליכה מנהלתית נעימה בין מטעי בננות עד להגעה לכנרת, ליד הגשר שעובר מתחת לכביש 90.",
+    mapeak:"https://mapeak.com/share/kJt9iIeVr1",
+    gmaps:gmapsDir("חניון נחל עמוד תחתון","כנרת")
+  }
+];
+
+/* ---------- RENDER ROUTE ---------- */
+function sameDay(a,b){
+  return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate();
+}
+
+const now = (function(){
+  const params = new URLSearchParams(window.location.search);
+  const demo = params.get('demo'); // e.g. ?demo=2026-11-13 for testing
+  if(demo){
+    const parts = demo.split('-').map(Number);
+    return new Date(parts[0], parts[1]-1, parts[2]);
+  }
+  return new Date();
+})();
+let todayDayObj = days.find(d=>sameDay(d.date, now));
+
+const pill = document.getElementById('todayPill');
+if(todayDayObj){
+  pill.innerHTML = "📍 <b>עכשיו: יום "+todayDayObj.n+"</b> — "+todayDayObj.from+" ← "+todayDayObj.to;
+} else if (now < TRIP_START){
+  const diff = Math.ceil((TRIP_START - now)/(1000*60*60*24));
+  pill.innerHTML = "🗓️ עוד <b>"+diff+" ימים</b> ליציאה";
+} else {
+  pill.innerHTML = "✅ הטיול הסתיים — נסיעה טובה בזיכרון";
+}
+
+const routeEl = document.getElementById('route');
+routeEl.innerHTML = days.map(d=>{
+  const isToday = sameDay(d.date, now);
+  return `
+  <div class="day-card ${isToday?'is-today':''}">
+    <div class="day-head">
+      <div>
+        <div class="day-num">יום ${d.n} · ${d.dateLabel}</div>
+        <div class="day-title">${d.from} ← ${d.to}</div>
+      </div>
+      ${isToday?'<div class="today-badge">📍 היום</div>':''}
+    </div>
+    <div class="stats-row">
+      <div class="stat"><b>${d.dist}</b><span>מרחק</span></div>
+      <div class="stat"><b>+${d.up}</b><span>עלייה</span></div>
+      <div class="stat"><b>-${d.down}</b><span>ירידה</span></div>
+    </div>
+    <div class="day-body">
+      ${d.sunsetWarning ? `<div class="sunset-warning">🌇 <b>שקיעה מוקדמת</b> — ${d.sunsetWarning}</div>` : ''}
+      <p>${d.text}</p>
+      <div class="day-links">
+        <a class="pill-link gmaps" target="_blank" href="${d.gmaps}">🧭 מסלול הליכה — Google Maps</a>
+        <a class="pill-link mapeak" target="_blank" href="${d.mapeak}">🗺️ GPX מלא — mapeak</a>
+        <button class="pill-link ics-btn" data-day="${d.n}">📅 הוסף ליומן</button>
+      </div>
+    </div>
+  </div>`;
+}).join('');
+
+/* ---------- ICS CALENDAR EXPORT ---------- */
+function pad(n){ return n<10 ? '0'+n : ''+n; }
+function toICSDate(d){
+  return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate());
+}
+function downloadICS(day){
+  const dt = toICSDate(day.date);
+  const nextDay = new Date(day.date); nextDay.setDate(nextDay.getDate()+1);
+  const dtEnd = toICSDate(nextDay);
+  const uid = "yamelyam-day"+day.n+"@trip";
+  const desc = (day.text+"").replace(/\n/g,'\\n').replace(/,/g,'\\,');
+  const ics = [
+    "BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Yam El Yam Trip//HE",
+    "BEGIN:VEVENT",
+    "UID:"+uid,
+    "DTSTART;VALUE=DATE:"+dt,
+    "DTEND;VALUE=DATE:"+dtEnd,
+    "SUMMARY:יום "+day.n+" — "+day.from+" ל"+day.to,
+    "DESCRIPTION:"+desc,
+    "END:VEVENT","END:VCALENDAR"
+  ].join("\r\n");
+  const blob = new Blob([ics], {type:"text/calendar;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = "yam-el-yam-day"+day.n+".ics";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+document.querySelectorAll('.ics-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const dayObj = days.find(d=>d.n===parseInt(btn.dataset.day));
+    if(dayObj) downloadICS(dayObj);
+  });
+});
+
+/* ---------- SOS PANEL ---------- */
+const sosBtn = document.getElementById('sosBtn');
+const sosPanel = document.getElementById('sosPanel');
+const sosOverlay = document.getElementById('sosOverlay');
+const sosClose = document.getElementById('sosClose');
+function openSOS(){ sosPanel.classList.add('open'); sosOverlay.classList.add('open'); }
+function closeSOS(){ sosPanel.classList.remove('open'); sosOverlay.classList.remove('open'); }
+sosBtn.addEventListener('click', openSOS);
+sosClose.addEventListener('click', closeSOS);
+sosOverlay.addEventListener('click', closeSOS);
+
+/* ---------- LODGING (SHARED STORAGE, EDITABLE) ---------- */
+const nights = [
+  {id:1, label:"לילה 1", sub:"אחרי יום 1 · ליד אבירים · חמישי 12.11"},
+  {id:2, label:"לילה 2", sub:"אחרי יום 2 · ליד הר מירון / חורבת חממה · שישי 13.11"},
+  {id:3, label:"לילה 3", sub:"אחרי יום 3 · ליד נחל עמוד תחתון · שבת 14.11"}
+];
+
+const nightsEl = document.getElementById('nightsCats');
+nightsEl.innerHTML = nights.map(n=>`
+  <div class="night-card">
+    <div class="night-head">
+      <div>
+        <div class="nt">${n.label}</div>
+        <div class="nt-sub">${n.sub}</div>
+      </div>
+      <div class="status-tag tbd" id="status_${n.id}">טרם נקבע</div>
+    </div>
+    <div class="night-body">
+      <div class="field-row">
+        <span class="field-label">שם המקום</span>
+        <div class="field-editable" contenteditable="true" data-key="lodging:${n.id}:name" data-placeholder="לדוגמה: אכסניית ..."></div>
+      </div>
+      <div class="field-row">
+        <span class="field-label">טלפון</span>
+        <div class="field-editable" contenteditable="true" data-key="lodging:${n.id}:phone" data-placeholder="05X-XXXXXXX"></div>
+      </div>
+      <div class="field-row">
+        <span class="field-label">קישור (אתר / הזמנה / Waze)</span>
+        <div class="field-editable" contenteditable="true" data-key="lodging:${n.id}:link" data-placeholder="https://..."></div>
+      </div>
+      <div class="field-row">
+        <span class="field-label">הערות</span>
+        <div class="field-editable" contenteditable="true" data-key="lodging:${n.id}:notes" data-placeholder="מחיר, סטטוס תשלום, שעת צ׳ק־אין..."></div>
+      </div>
+      <div class="night-actions">
+        <a class="pill-link" id="call_${n.id}" href="#" style="pointer-events:none; opacity:.4;">📞 חיוג</a>
+        <a class="pill-link" id="open_${n.id}" href="#" target="_blank" style="pointer-events:none; opacity:.4;">🔗 פתח קישור</a>
+        <span class="saved-flash" id="flash_${n.id}">נשמר ✓</span>
+      </div>
+    </div>
+  </div>
+`).join('');
+
+async function loadText(key){
+  try{
+    const r = await window.storage.get(key, true);
+    return r ? r.value : '';
+  }catch(e){ return ''; }
+}
+async function saveText(key, val){
+  try{ await window.storage.set(key, val, true); }catch(e){ console.error(e); }
+}
+
+function refreshNightStatus(n){
+  const nameEl = document.querySelector(`[data-key="lodging:${n.id}:name"]`);
+  const phoneEl = document.querySelector(`[data-key="lodging:${n.id}:phone"]`);
+  const linkEl = document.querySelector(`[data-key="lodging:${n.id}:link"]`);
+  const statusEl = document.getElementById('status_'+n.id);
+  const callBtn = document.getElementById('call_'+n.id);
+  const openBtn = document.getElementById('open_'+n.id);
+
+  const hasName = nameEl.textContent.trim().length>0;
+  statusEl.textContent = hasName ? "עודכן" : "טרם נקבע";
+  statusEl.className = "status-tag " + (hasName ? "confirmed" : "tbd");
+
+  const phone = phoneEl.textContent.trim();
+  if(phone){
+    callBtn.href = "tel:"+phone.replace(/[^0-9+]/g,'');
+    callBtn.style.pointerEvents = "auto"; callBtn.style.opacity = "1";
+  } else {
+    callBtn.style.pointerEvents = "none"; callBtn.style.opacity = ".4";
+  }
+  const link = linkEl.textContent.trim();
+  if(link){
+    openBtn.href = link.startsWith('http') ? link : 'https://'+link;
+    openBtn.style.pointerEvents = "auto"; openBtn.style.opacity = "1";
+  } else {
+    openBtn.style.pointerEvents = "none"; openBtn.style.opacity = ".4";
+  }
+}
+
+function updateLodgingShortcut(){
+  const confirmedCount = nights.filter(n=>{
+    const el = document.getElementById('status_'+n.id);
+    return el && el.classList.contains('confirmed');
+  }).length;
+  const statusSpan = document.getElementById('lodgingShortcutStatus');
+  statusSpan.textContent = confirmedCount === nights.length
+    ? "כל הלילות עודכנו ✓"
+    : confirmedCount + "/" + nights.length + " עודכנו";
+}
+
+async function initLodgingFields(){
+  const fields = document.querySelectorAll('.field-editable[data-key]');
+  for(const field of fields){
+    const key = field.dataset.key;
+    const val = await loadText(key);
+    if(val) field.textContent = val;
+    field.addEventListener('blur', async ()=>{
+      await saveText(key, field.textContent.trim());
+      const nId = parseInt(key.split(':')[1]);
+      const nObj = nights.find(x=>x.id===nId);
+      refreshNightStatus(nObj);
+      updateLodgingShortcut();
+      const flash = document.getElementById('flash_'+nId);
+      flash.classList.add('show');
+      setTimeout(()=>flash.classList.remove('show'), 1400);
+    });
+  }
+  nights.forEach(refreshNightStatus);
+  updateLodgingShortcut();
+}
+initLodgingFields();
+
+document.getElementById('lodgingShortcut').addEventListener('click', (e)=>{
+  e.preventDefault();
+  document.querySelector('nav button[data-view="lodging"]').click();
+});
+
+/* ---------- GEAR (SHARED STORAGE) ---------- */
+const gearData = [
+  {cat:"ביגוד", items:[
+    "תיק יום נוח (25-35 ליטר)","נעלי הליכה נוחות שכבר עברו שימוש","סנדלים/נעליים להחלפה לערב",
+    "2-3 זוגות גרבי הליכה איכותיות","2-3 חולצות מנדפות זיעה","2 מכנסי הליכה","בגדים נוחים לערב",
+    "תחתונים להחלפה","כובע רחב שוליים","מעיל גשם דק או פונצ'ו","פליז/סווטשירט לערב"
+  ]},
+  {cat:"מים ומזון", items:[
+    "2-3 ליטר מים","בקבוק או שקית שתייה","חטיפי אנרגיה","פירות יבשים ואגוזים",
+    "כריכים או אוכל ליום הליכה","אבקות איזוטוניות / אלקטרוליטים"
+  ]},
+  {cat:"ציוד אישי", items:[
+    "טלפון נייד","מטען","סוללה ניידת (Power Bank)","תעודת זהות","כסף מזומן וכרטיס אשראי",
+    "פנס ראש","משקפי שמש"
+  ]},
+  {cat:"רחצה ולינה", items:[
+    "מגבת קלה","כלי רחצה אישיים","מברשת ומשחת שיניים","שמפו וסבון","כפכפים למקלחת","תרופות קבועות"
+  ]},
+  {cat:"בטיחות ובריאות", items:[
+    "קרם הגנה","שפתון עם מקדם הגנה","חומר נגד יתושים","פלסטרים למניעת שלפוחיות",
+    "תחבושת אלסטית","ערכת עזרה ראשונה קטנה","ג'ל חיטוי לידיים"
+  ]},
+  {cat:"ציוד מומלץ", items:[
+    "מקלות הליכה","שעון ספורט או אפליקציית ניווט","שקיות אטומות לבגדים רטובים",
+    "שקית אשפה קטנה","מחברת ועט"
+  ]}
+];
+
+const beforeItems = [
+  "לבדוק תחזית מזג אוויר",
+  "להטעין טלפון וסוללה ניידת",
+  "למלא מים לפני תחילת כל יום הליכה",
+  "לנעול רק נעליים שכבר \"נשברו\" — לא חדשות",
+  "להימרח בקרם הגנה לפני היציאה ולחדש במהלך היום",
+  "לארוז קל — משקל התיק המומלץ עד כ-10%-15% ממשקל הגוף"
+];
+
+function slug(s){ return s.replace(/[^א-תa-zA-Z0-9]/g,'').slice(0,24); }
+
+async function loadChecked(key){
+  try{
+    const r = await window.storage.get(key, true);
+    return r && r.value === '1';
+  }catch(e){ return false; }
+}
+async function setChecked(key, val){
+  try{ await window.storage.set(key, val ? '1':'0', true); }catch(e){ console.error(e); }
+}
+
+const gearCatsEl = document.getElementById('gearCats');
+const gearProgressEl = document.getElementById('gearProgress');
+const beforeListEl = document.getElementById('beforeList');
+
+let allCheckboxes = [];
+
+function buildGearDOM(){
+  gearCatsEl.innerHTML = gearData.map((cat, ci)=>{
+    const itemsHtml = cat.items.map((it, ii)=>{
+      const id = "g_"+ci+"_"+ii+"_"+slug(it);
+      return `<div class="gear-item">
+        <input type="checkbox" id="${id}" data-key="gear:${id}">
+        <label for="${id}">${it}</label>
+      </div>`;
+    }).join('');
+    return `<details class="gear-cat" open>
+      <summary>${cat.cat} <span class="count" id="cnt_${ci}"></span></summary>
+      ${itemsHtml}
+    </details>`;
+  }).join('');
+
+  beforeListEl.innerHTML = beforeItems.map((it, ii)=>{
+    const id = "b_"+ii+"_"+slug(it);
+    return `<div class="gear-item">
+      <input type="checkbox" id="${id}" data-key="before:${id}">
+      <label for="${id}">${it}</label>
+    </div>`;
+  }).join('');
+}
+buildGearDOM();
+
+async function initCheckboxState(){
+  const boxes = document.querySelectorAll('input[type=checkbox][data-key]');
+  allCheckboxes = Array.from(boxes);
+  for(const box of allCheckboxes){
+    const key = box.dataset.key;
+    const checked = await loadChecked(key);
+    box.checked = checked;
+    const label = document.querySelector('label[for="'+box.id+'"]');
+    if(checked && label) label.classList.add('checked');
+    box.addEventListener('change', async ()=>{
+      await setChecked(key, box.checked);
+      if(label) label.classList.toggle('checked', box.checked);
+      updateProgress();
+    });
+  }
+  updateProgress();
+}
+
+function updateProgress(){
+  gearData.forEach((cat, ci)=>{
+    const boxes = document.querySelectorAll(`[id^="g_${ci}_"]`);
+    const checkedCount = Array.from(boxes).filter(b=>b.checked).length;
+    const el = document.getElementById('cnt_'+ci);
+    if(el) el.textContent = checkedCount + "/" + boxes.length;
+  });
+  const gearBoxes = document.querySelectorAll('input[data-key^="gear:"]');
+  const gearChecked = Array.from(gearBoxes).filter(b=>b.checked).length;
+  gearProgressEl.textContent = "ארזתם " + gearChecked + " מתוך " + gearBoxes.length + " פריטים · הרשימה משותפת לכל הקבוצה";
+}
+
+initCheckboxState();
+
+/* ---------- NAV ---------- */
+document.querySelectorAll('nav button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.view).classList.add('active');
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+});
+</script>
+</body>
+</html>
