@@ -11,16 +11,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700;900&family=Heebo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --ink:#2B3A2E;
-    --paper:#F6F1E4;
-    --paper-2:#EEE6D2;
-    --olive:#4A5A3C;
-    --olive-dk:#33402A;
-    --clay:#B5602E;
-    --clay-lt:#E8B98C;
-    --dusk:#3C4A5C;
-    --line:#D9CCA8;
-    --today:#B5602E;
+    --ink:#1F2E2E;
+    --paper:#F4F7F2;
+    --paper-2:#E6EFE9;
+    --olive:#155050;
+    --olive-dk:#0F3D3E;
+    --clay:#C1622D;
+    --clay-lt:#E9A574;
+    --dusk:#2CA6A4;
+    --line:#D7E0DB;
+    --today:#C1622D;
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
   html,body{margin:0;padding:0;}
@@ -45,8 +45,8 @@
     content:"";
     position:absolute; inset:0;
     background-image:
-      radial-gradient(circle at 85% 15%, rgba(246,241,228,0.12), transparent 40%),
-      repeating-linear-gradient(115deg, rgba(246,241,228,0.05) 0 2px, transparent 2px 18px);
+      radial-gradient(circle at 85% 15%, rgba(244,247,242,0.12), transparent 40%),
+      repeating-linear-gradient(115deg, rgba(244,247,242,0.05) 0 2px, transparent 2px 18px);
     pointer-events:none;
   }
   .eyebrow{
@@ -57,21 +57,51 @@
     font-size:34px; margin:6px 0 4px; font-weight:900; line-height:1.1;
   }
   .subline{font-size:14px; opacity:.9;}
+  .top-row{
+    display:flex; align-items:center; justify-content:center;
+    gap:8px; margin-top:14px; flex-wrap:wrap;
+  }
   .today-pill{
     display:inline-flex; align-items:center; gap:6px;
-    background:rgba(246,241,228,0.16);
-    border:1px solid rgba(246,241,228,0.35);
+    background:rgba(244,247,242,0.16);
+    border:1px solid rgba(244,247,242,0.35);
     border-radius:999px;
     padding:6px 14px;
     font-size:13px;
-    margin-top:14px;
     backdrop-filter:blur(2px);
   }
   .today-pill b{font-family:'Frank Ruhl Libre',serif; font-size:14px;}
+  .weather-pill{
+    display:inline-flex; align-items:center; gap:6px;
+    background:rgba(244,247,242,0.16);
+    border:1px solid rgba(244,247,242,0.35);
+    border-radius:999px;
+    padding:6px 14px;
+    font-size:13px;
+    backdrop-filter:blur(2px);
+    transition:background .3s, border-color .3s;
+  }
+  .weather-pill b{font-family:'Frank Ruhl Libre',serif; font-size:14px;}
+  .weather-pill.weather-cold{
+    background:linear-gradient(135deg, rgba(108,146,183,0.32), rgba(60,74,92,0.30));
+    border-color:rgba(163,196,224,0.55);
+  }
+  .weather-pill.weather-mild{
+    background:linear-gradient(135deg, rgba(140,176,120,0.32), rgba(74,90,60,0.30));
+    border-color:rgba(178,209,152,0.55);
+  }
+  .weather-pill.weather-warm{
+    background:linear-gradient(135deg, rgba(232,185,140,0.35), rgba(193,98,45,0.28));
+    border-color:rgba(232,185,140,0.6);
+  }
+  .weather-pill.weather-hot{
+    background:linear-gradient(135deg, rgba(214,110,66,0.4), rgba(150,54,38,0.32));
+    border-color:rgba(230,140,100,0.6);
+  }
   .lodging-shortcut{
     display:flex; align-items:center; justify-content:space-between;
     background:rgba(20,20,15,0.22);
-    border:1px dashed rgba(246,241,228,0.45);
+    border:1px dashed rgba(244,247,242,0.45);
     border-radius:12px;
     padding:10px 14px;
     margin-top:10px;
@@ -83,7 +113,7 @@
   .crew-photo{
     position:absolute; top:20px; left:20px;
     width:86px; height:86px; border-radius:50%;
-    border:3px solid rgba(246,241,228,0.85);
+    border:3px solid rgba(244,247,242,0.85);
     box-shadow:0 4px 16px rgba(0,0,0,0.38);
     object-fit:cover; z-index:2;
   }
@@ -99,7 +129,7 @@
   nav button{
     flex:1; padding:13px 4px; background:none; border:none;
     font-family:'Heebo',sans-serif; font-size:13px; font-weight:600;
-    color:#8A8368; cursor:pointer; border-bottom:3px solid transparent;
+    color:#6C8481; cursor:pointer; border-bottom:3px solid transparent;
     transition:.15s;
   }
   nav button.active{color:var(--olive-dk); border-bottom-color:var(--clay);}
@@ -120,7 +150,7 @@
   }
   .day-card.is-today{
     border:3px solid var(--clay);
-    box-shadow:0 10px 28px rgba(181,96,46,0.28);
+    box-shadow:0 10px 28px rgba(193,98,45,0.28);
     transform:scale(1.015);
   }
   .day-card.is-today .day-head{
@@ -143,26 +173,26 @@
     color:var(--olive-dk); text-transform:uppercase;
   }
   .day-title{font-size:19px; font-weight:700; margin-top:2px;}
-  .day-date{font-size:12px; color:#7A745C; margin-top:2px;}
+  .day-date{font-size:12px; color:#5A7573; margin-top:2px;}
   .today-badge{
     background:var(--clay); color:#fff; font-size:12.5px; font-weight:900;
     padding:6px 14px; border-radius:999px; white-space:nowrap;
     letter-spacing:.02em;
-    box-shadow:0 3px 10px rgba(181,96,46,0.45);
+    box-shadow:0 3px 10px rgba(193,98,45,0.45);
     animation:pulseBadge 2s ease-in-out infinite;
   }
   @keyframes pulseBadge{
-    0%,100%{ box-shadow:0 3px 10px rgba(181,96,46,0.45); }
-    50%{ box-shadow:0 3px 16px rgba(181,96,46,0.75); }
+    0%,100%{ box-shadow:0 3px 10px rgba(193,98,45,0.45); }
+    50%{ box-shadow:0 3px 16px rgba(193,98,45,0.75); }
   }
   .stats-row{
     display:flex; gap:0; padding:12px 16px; border-bottom:1px solid var(--line);
   }
   .stat{flex:1; text-align:center;}
   .stat b{display:block; font-family:'Frank Ruhl Libre',serif; font-size:18px; color:var(--olive-dk);}
-  .stat span{font-size:10.5px; color:#8A8368;}
+  .stat span{font-size:10.5px; color:#6C8481;}
   .day-body{padding:14px 16px 16px;}
-  .day-body p{font-size:14px; line-height:1.65; margin:0 0 12px; color:#3D3B2E;}
+  .day-body p{font-size:14px; line-height:1.65; margin:0 0 12px; color:#22383A;}
   .day-links{display:flex; gap:8px; flex-wrap:wrap;}
   .pill-link{
     display:inline-flex; align-items:center; gap:6px;
@@ -173,7 +203,7 @@
     color:var(--olive-dk);
     background:var(--paper);
   }
-  .pill-link.gmaps{background:#3C4A5C; color:#fff; border-color:#3C4A5C;}
+  .pill-link.gmaps{background:var(--dusk); color:#fff; border-color:var(--dusk);}
   .pill-link.mapeak{background:var(--olive); color:#fff; border-color:var(--olive);}
   button.pill-link{font-family:'Heebo',sans-serif; cursor:pointer;}
   .pill-link.ics-btn{background:#5A4A8A; color:#fff; border-color:#5A4A8A;}
@@ -196,7 +226,7 @@
     background:var(--paper-2); list-style:none;
   }
   .gear-cat summary::-webkit-details-marker{display:none;}
-  .gear-cat summary .count{font-size:11.5px; font-weight:500; color:#8A8368;}
+  .gear-cat summary .count{font-size:11.5px; font-weight:500; color:#6C8481;}
   .gear-cat[open] summary{border-bottom:1px solid var(--line);}
   .gear-item{
     display:flex; align-items:center; gap:10px;
@@ -206,9 +236,9 @@
   .gear-item input[type=checkbox]{
     width:20px; height:20px; accent-color:var(--olive); flex-shrink:0;
   }
-  .gear-item label.checked{text-decoration:line-through; color:#A39C82;}
+  .gear-item label.checked{text-decoration:line-through; color:#8FA6A4;}
   .gear-progress{
-    font-size:12px; color:#8A8368; padding:0 2px 10px; text-align:left;
+    font-size:12px; color:#6C8481; padding:0 2px 10px; text-align:left;
   }
 
   /* TRANSPORT */
@@ -231,8 +261,35 @@
   .call-btn.secondary{background:transparent; border:1px solid #5A5744; color:#F2EFE6;}
   .info-box{
     background:#fff; border:1px solid var(--line); border-radius:14px; padding:16px;
-    font-size:13.5px; line-height:1.7; color:#4A4738;
+    font-size:13.5px; line-height:1.7; color:#2E4645;
   }
+  .contact-card-sm{position:relative; padding:18px 18px 16px; text-align:right;}
+  .contact-card-sm h2{font-size:17px;}
+  .contact-card-sm .call-btn{font-size:14px; padding:11px;}
+  .contact-remove{
+    position:absolute; top:12px; left:12px; width:26px; height:26px;
+    border-radius:50%; border:1px solid #5A5744; background:transparent;
+    color:#C9BE8F; font-size:13px; cursor:pointer; line-height:1;
+  }
+  .add-contact-btn{
+    display:block; width:100%; text-align:center; background:#fff;
+    border:1.5px dashed var(--line); color:var(--olive); font-weight:700;
+    font-size:14px; padding:13px; border-radius:14px; margin-top:6px; cursor:pointer;
+  }
+  .add-contact-form{
+    background:#fff; border:1px solid var(--line); border-radius:14px;
+    padding:16px; margin-top:6px;
+  }
+  .add-contact-form input{
+    width:100%; box-sizing:border-box; border:1px solid var(--line); border-radius:10px;
+    padding:11px 12px; font-size:14px; font-family:inherit; margin-bottom:8px; color:var(--ink);
+  }
+  .add-contact-form .row{display:flex; gap:8px;}
+  .add-contact-form .row button{
+    flex:1; border:none; border-radius:10px; padding:11px; font-weight:700; font-size:14px; cursor:pointer;
+  }
+  .add-contact-form .save-btn{background:var(--olive); color:#fff;}
+  .add-contact-form .cancel-btn{background:var(--paper-2); color:var(--ink);}
 
   /* LINKS TAB */
   .link-item{
@@ -246,7 +303,7 @@
     background:var(--paper-2);
   }
   .link-item .txt b{display:block; font-size:14px;}
-  .link-item .txt span{font-size:12px; color:#8A8368;}
+  .link-item .txt span{font-size:12px; color:#6C8481;}
 
   .before-list{background:#fff; border:1px solid var(--line); border-radius:14px; padding:6px 16px;}
 
@@ -265,20 +322,20 @@
     padding:14px 16px; background:var(--paper-2);
   }
   .night-head .nt{font-size:11px; font-weight:700; color:var(--olive-dk); text-transform:uppercase; letter-spacing:.06em;}
-  .night-head .nt-sub{font-size:12px; color:#7A745C; margin-top:2px;}
+  .night-head .nt-sub{font-size:12px; color:#5A7573; margin-top:2px;}
   .status-tag{font-size:10.5px; font-weight:700; padding:4px 10px; border-radius:999px;}
   .status-tag.tbd{background:#FBEFDE; color:#8A5A1E;}
   .status-tag.confirmed{background:#DCEAD4; color:#3A6B2E;}
   .night-body{padding:14px 16px;}
   .field-row{margin-bottom:12px;}
   .field-row:last-child{margin-bottom:0;}
-  .field-label{font-size:11px; color:#8A8368; font-weight:700; margin-bottom:5px; display:block;}
+  .field-label{font-size:11px; color:#6C8481; font-weight:700; margin-bottom:5px; display:block;}
   .field-editable{
     border:1px solid var(--line); border-radius:10px; padding:10px 12px;
     font-size:14px; font-family:'Heebo',sans-serif; background:var(--paper);
     min-height:20px; outline:none; color:var(--ink);
   }
-  .field-editable:empty::before{content:attr(data-placeholder); color:#A39C82;}
+  .field-editable:empty::before{content:attr(data-placeholder); color:#8FA6A4;}
   .field-editable:focus{border-color:var(--clay); background:#fff;}
   .night-actions{display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;}
   .saved-flash{font-size:11px; color:var(--olive); opacity:0; transition:opacity .3s;}
@@ -318,8 +375,8 @@
   }
   .sos-item:last-of-type{border-bottom:none;}
   .sos-item b{font-family:'Frank Ruhl Libre',serif; font-size:20px; color:#B23B2E; min-width:56px;}
-  .sos-item span{font-size:13px; color:#4A4738;}
-  .sos-note{font-size:11.5px; color:#8A8368; margin-top:10px; line-height:1.6;}
+  .sos-item span{font-size:13px; color:#2E4645;}
+  .sos-note{font-size:11.5px; color:#6C8481; margin-top:10px; line-height:1.6;}
   .sos-overlay{
     position:fixed; inset:0; background:rgba(20,18,14,0.4); z-index:45;
     opacity:0; pointer-events:none; transition:opacity .3s;
@@ -335,7 +392,7 @@
   }
   .sunset-warning b{color:#FFB37A;}
 
-  footer{text-align:center; font-size:11px; color:#A39C82; padding:22px 20px 10px;}
+  footer{text-align:center; font-size:11px; color:#8FA6A4; padding:22px 20px 10px;}
 </style>
 </head>
 <body>
@@ -345,9 +402,18 @@
   <div class="eyebrow">גליל עליון · הרי מירון</div>
   <h1>ים אל ים</h1>
   <div class="subline">עבדון ← אבירים ← הר מירון ← נחל עמוד ← כנרת · 4 ימים</div>
-  <div class="today-pill" id="todayPill">טוען תאריך…</div>
+  <div class="top-row">
+    <div class="today-pill" id="todayPill">טוען תאריך…</div>
+    <div class="weather-pill" id="weatherPill">🌤️ טוען מזג אוויר…</div>
+  </div>
   <a href="#" class="lodging-shortcut" id="lodgingShortcut">🛏️ מקומות לינה — <span id="lodgingShortcutStatus">טרם נקבע</span> ›</a>
 </header>
+
+<noscript>
+  <div style="background:#FBEFDE;border:1px solid #E7CDA0;color:#8A5A1E;padding:14px 18px;margin:14px 16px;border-radius:12px;font-size:14px;line-height:1.6;">
+    ⚠️ הדף הזה לא נטען כמו שצריך. כנראה שהוא נפתח בתצוגה מקדימה (למשל תוך כדי WhatsApp / Files / מייל) שלא מריצה קוד. יש לשמור את הקובץ ולפתוח אותו ישירות בדפדפן (Safari / Chrome) כדי שהכל יעבוד.
+  </div>
+</noscript>
 
 <nav>
   <button data-view="route" class="active">מסלול</button>
@@ -390,6 +456,19 @@
     <div class="info-box">
       <b>למה זה כאן:</b> הסעה לנקודת הזינוק (צומת עבדון) ו/או איסוף מנחל עמוד תחתון או מהכנרת בסיום. מומלץ לתאם מראש יום־יומיים לפני, במיוחד לימי סוף שבוע.
     </div>
+
+    <div class="sec-label">אנשי קשר נוספים להסעה</div>
+    <div id="extraContacts"></div>
+    <button type="button" class="add-contact-btn" id="addContactBtn">➕ הוסף איש קשר</button>
+    <div class="add-contact-form" id="addContactForm" style="display:none;">
+      <input type="text" id="newContactName" placeholder="שם / חברה">
+      <input type="tel" id="newContactPhone" placeholder="טלפון">
+      <input type="text" id="newContactNote" placeholder="הערה (לא חובה)">
+      <div class="row">
+        <button type="button" class="save-btn" id="saveContactBtn">שמור</button>
+        <button type="button" class="cancel-btn" id="cancelContactBtn">ביטול</button>
+      </div>
+    </div>
   </section>
 
   <!-- LINKS VIEW -->
@@ -405,7 +484,7 @@
       <b>אופציה זולה לצומת עבדון</b> (לפי דיווח מטייל קודם באותו מסלול):<br>
       🚆 רכבת ~06:30 מתל אביב לנהריה<br>
       🚌 קו 37 ~09:00 מנהריה לצומת עבדון<br>
-      <span style="color:#8A8368; font-size:12px;">⚠️ שעות משוערות בלבד — לבדוק לוח זמנים מעודכן קרוב לתאריך, זה עלול להשתנות בסופ״ש/חג.</span>
+      <span style="color:#6C8481; font-size:12px;">⚠️ שעות משוערות בלבד — לבדוק לוח זמנים מעודכן קרוב לתאריך, זה עלול להשתנות בסופ״ש/חג.</span>
     </div>
     <a class="link-item" target="_blank" href="https://www.rail.co.il/">
       <div class="ico">🚆</div>
@@ -474,7 +553,119 @@
 
 <footer>נבנה עבור קבוצת הטיול · הנתונים בטאבים "ציוד" ו"לינה" משותפים לכולם</footer>
 
+<!-- Firebase (for live shared sync between the whole group). If FIREBASE_CONFIG
+     below is left empty, or these fail to load (no internet), the site
+     automatically falls back to saving data locally on each phone. -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
 <script>
+/* ============================================================
+   SHARED REALTIME STORE
+   - If FIREBASE_CONFIG below is filled in, gear/lodging data syncs
+     live between everyone in the group via Firebase Firestore.
+   - If it's left empty, or Firebase fails to load (no internet,
+     wrong config, etc.), it automatically falls back to
+     localStorage — data still works, but only on THIS phone.
+   ============================================================ */
+
+// 👉 PASTE YOUR FIREBASE CONFIG HERE (from Firebase Console → Project settings → Your apps → SDK setup)
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCMwCq1uTqBD7MywQSYJ_n_GIPWlUqMXU8", // 👈 from Firebase Console → Project settings → Your apps — starts with "AIza..."
+  authDomain: "yamelyam-1433f.firebaseapp.com",
+  projectId: "yamelyam-1433f",
+  storageBucket: "yamelyam-1433f.firebasestorage.app",
+  messagingSenderId: "810884291868",
+  appId: "1:810884291868:web:85748aedd9e16270226ed9",
+  measurementId: "G-XH3BR6P1KF"
+};
+
+const Store = {
+  cache: {},          // local in-memory copy of every synced key/value
+  listeners: [],       // callbacks to run whenever data changes (local or remote)
+  docRef: null,        // Firestore document reference, if connected
+  usingFirebase: false,
+
+  async init(){
+    // Warm the cache from localStorage first so the UI has *something*
+    // to show immediately, even before Firebase connects (or if it never does).
+    try{
+      for(const key of Object.keys(localStorage)){
+        if(key.startsWith('gear:') || key.startsWith('before:') || key.startsWith('lodging:')){
+          this.cache[key] = localStorage.getItem(key);
+        }
+      }
+    }catch(e){ /* localStorage unavailable — ignore */ }
+
+    const hasConfig = FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.projectId;
+    if(!hasConfig || typeof firebase === 'undefined'){
+      if(hasConfig) console.warn('Firebase config set but SDK did not load — using local-only storage.');
+      return;
+    }
+    try{
+      firebase.initializeApp(FIREBASE_CONFIG);
+      const db = firebase.firestore();
+      this.docRef = db.collection('trips').doc('yam-el-yam');
+      this.docRef.onSnapshot(snap=>{
+        this.usingFirebase = true;
+        const remote = (snap.exists && snap.data() && snap.data().values) || {};
+        this.cache = Object.assign({}, this.cache, remote);
+        this.notify();
+      }, err=>{
+        console.error('Firestore listen failed, staying on local storage', err);
+      });
+    }catch(e){
+      console.error('Firebase init failed, using local storage only', e);
+    }
+  },
+
+  get(key){
+    return this.cache[key] || '';
+  },
+
+  async set(key, value){
+    this.cache[key] = value;
+    try{ localStorage.setItem(key, value); }catch(e){ /* ignore */ }
+    if(this.docRef){
+      try{
+        await this.docRef.set({ values: { [key]: value } }, { merge:true });
+      }catch(e){
+        console.error('Cloud save failed, kept locally only', e);
+      }
+    }
+    this.notify();
+  },
+
+  onChange(cb){ this.listeners.push(cb); },
+  notify(){ this.listeners.forEach(cb=>{ try{ cb(); }catch(e){ console.error(e); } }); }
+};
+Store.init();
+
+/* ---------- NAV + SOS: bind FIRST, before anything else runs ----------
+   This guarantees tab-switching and the SOS button always work even if
+   some other part of the script below throws an error. */
+document.querySelectorAll('nav button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.view).classList.add('active');
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+});
+
+(function(){
+  const sosBtn = document.getElementById('sosBtn');
+  const sosPanel = document.getElementById('sosPanel');
+  const sosOverlay = document.getElementById('sosOverlay');
+  const sosClose = document.getElementById('sosClose');
+  function openSOS(){ sosPanel.classList.add('open'); sosOverlay.classList.add('open'); }
+  function closeSOS(){ sosPanel.classList.remove('open'); sosOverlay.classList.remove('open'); }
+  sosBtn.addEventListener('click', openSOS);
+  sosClose.addEventListener('click', closeSOS);
+  sosOverlay.addEventListener('click', closeSOS);
+})();
+
 /* ---------- TRIP DATA ---------- */
 const TRIP_START = new Date(2026, 10, 12); // 12 Nov 2026 (months 0-indexed)
 
@@ -523,55 +714,141 @@ function sameDay(a,b){
   return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate();
 }
 
-const now = (function(){
-  const params = new URLSearchParams(window.location.search);
-  const demo = params.get('demo'); // e.g. ?demo=2026-11-13 for testing
-  if(demo){
-    const parts = demo.split('-').map(Number);
-    return new Date(parts[0], parts[1]-1, parts[2]);
+try{
+  const now = (function(){
+    const params = new URLSearchParams(window.location.search);
+    const demo = params.get('demo'); // e.g. ?demo=2026-11-13 for testing
+    if(demo){
+      const parts = demo.split('-').map(Number);
+      return new Date(parts[0], parts[1]-1, parts[2]);
+    }
+    return new Date();
+  })();
+  let todayDayObj = days.find(d=>sameDay(d.date, now));
+
+  const pill = document.getElementById('todayPill');
+  if(todayDayObj){
+    pill.innerHTML = "📍 <b>עכשיו: יום "+todayDayObj.n+"</b> — "+todayDayObj.from+" ← "+todayDayObj.to;
+  } else if (now < TRIP_START){
+    const diff = Math.ceil((TRIP_START - now)/(1000*60*60*24));
+    pill.innerHTML = "🗓️ עוד <b>"+diff+" ימים</b> ליציאה";
+  } else {
+    pill.innerHTML = "✅ הטיול הסתיים — נסיעה טובה בזיכרון";
   }
-  return new Date();
+
+  const routeEl = document.getElementById('route');
+  routeEl.innerHTML = days.map(d=>{
+    const isToday = sameDay(d.date, now);
+    return `
+    <div class="day-card ${isToday?'is-today':''}">
+      <div class="day-head">
+        <div>
+          <div class="day-num">יום ${d.n} · ${d.dateLabel}</div>
+          <div class="day-title">${d.from} ← ${d.to}</div>
+        </div>
+        ${isToday?'<div class="today-badge">📍 היום</div>':''}
+      </div>
+      <div class="stats-row">
+        <div class="stat"><b>${d.dist}</b><span>מרחק</span></div>
+        <div class="stat"><b>+${d.up}</b><span>עלייה</span></div>
+        <div class="stat"><b>-${d.down}</b><span>ירידה</span></div>
+      </div>
+      <div class="day-body">
+        ${d.sunsetWarning ? `<div class="sunset-warning">🌇 <b>שקיעה מוקדמת</b> — ${d.sunsetWarning}</div>` : ''}
+        <p>${d.text}</p>
+        <div class="day-links">
+          <a class="pill-link gmaps" target="_blank" href="${d.gmaps}">🧭 מסלול הליכה — Google Maps</a>
+          <a class="pill-link mapeak" target="_blank" href="${d.mapeak}">🗺️ GPX מלא — mapeak</a>
+          <button class="pill-link ics-btn" data-day="${d.n}">📅 הוסף ליומן</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}catch(e){ console.error('route render failed', e); }
+
+/* ---------- WEATHER (today, at the user's actual location) ---------- */
+(async function(){
+  const weatherPill = document.getElementById('weatherPill');
+  // Fallback if the user doesn't share location: Meron / Tzfat area (trip region)
+  const FALLBACK = {lat:32.965, lon:35.496, label:"באזור מירון"};
+
+  function weatherIcon(code){
+    if(code===0) return '☀️';
+    if([1,2].includes(code)) return '🌤️';
+    if(code===3) return '☁️';
+    if([45,48].includes(code)) return '🌫️';
+    if([51,53,55,56,57].includes(code)) return '🌦️';
+    if([61,63,65,66,67,80,81,82].includes(code)) return '🌧️';
+    if([71,73,75,77,85,86].includes(code)) return '❄️';
+    if([95,96,99].includes(code)) return '⛈️';
+    return '🌡️';
+  }
+  function weatherClass(temp){
+    if(temp <= 12) return 'weather-cold';
+    if(temp <= 22) return 'weather-mild';
+    if(temp <= 30) return 'weather-warm';
+    return 'weather-hot';
+  }
+
+  function getLocation(){
+    return new Promise(resolve=>{
+      if(!navigator.geolocation){ resolve(null); return; }
+      navigator.geolocation.getCurrentPosition(
+        pos => resolve({lat:pos.coords.latitude, lon:pos.coords.longitude, label:"במיקום שלך"}),
+        () => resolve(null),
+        {timeout:5000, maximumAge:600000}
+      );
+    });
+  }
+
+  async function fetchAndRender(lat, lon, label){
+    const primaryUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`;
+    const mirrorUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto&cell_selection=nearest`;
+
+    async function tryFetch(url){
+      const controller = new AbortController();
+      const timer = setTimeout(()=>controller.abort(), 8000);
+      try{
+        const res = await fetch(url, {signal:controller.signal});
+        if(!res.ok) throw new Error('bad response: '+res.status);
+        const data = await res.json();
+        if(!data.current_weather) throw new Error('no current_weather in response');
+        return data.current_weather;
+      } finally {
+        clearTimeout(timer);
+      }
+    }
+
+    let cw;
+    try{
+      cw = await tryFetch(primaryUrl);
+    }catch(e1){
+      console.error('weather primary request failed, retrying', e1);
+      cw = await tryFetch(mirrorUrl); // one retry before giving up on this location
+    }
+
+    const icon = weatherIcon(cw.weathercode);
+    weatherPill.className = 'weather-pill ' + weatherClass(cw.temperature);
+    weatherPill.innerHTML = `${icon} <b>${Math.round(cw.temperature)}°</b> ${label} עכשיו`;
+  }
+
+  try{
+    const loc = await getLocation();
+    if(loc){
+      await fetchAndRender(loc.lat, loc.lon, loc.label);
+    } else {
+      await fetchAndRender(FALLBACK.lat, FALLBACK.lon, FALLBACK.label);
+    }
+  }catch(e){
+    console.error('weather fetch failed for chosen location, falling back to trip region', e);
+    try{
+      await fetchAndRender(FALLBACK.lat, FALLBACK.lon, FALLBACK.label);
+    }catch(e2){
+      console.error('weather fetch failed completely (network/blocked)', e2);
+      weatherPill.innerHTML = '🌤️ מזג אוויר לא זמין כרגע';
+    }
+  }
 })();
-let todayDayObj = days.find(d=>sameDay(d.date, now));
-
-const pill = document.getElementById('todayPill');
-if(todayDayObj){
-  pill.innerHTML = "📍 <b>עכשיו: יום "+todayDayObj.n+"</b> — "+todayDayObj.from+" ← "+todayDayObj.to;
-} else if (now < TRIP_START){
-  const diff = Math.ceil((TRIP_START - now)/(1000*60*60*24));
-  pill.innerHTML = "🗓️ עוד <b>"+diff+" ימים</b> ליציאה";
-} else {
-  pill.innerHTML = "✅ הטיול הסתיים — נסיעה טובה בזיכרון";
-}
-
-const routeEl = document.getElementById('route');
-routeEl.innerHTML = days.map(d=>{
-  const isToday = sameDay(d.date, now);
-  return `
-  <div class="day-card ${isToday?'is-today':''}">
-    <div class="day-head">
-      <div>
-        <div class="day-num">יום ${d.n} · ${d.dateLabel}</div>
-        <div class="day-title">${d.from} ← ${d.to}</div>
-      </div>
-      ${isToday?'<div class="today-badge">📍 היום</div>':''}
-    </div>
-    <div class="stats-row">
-      <div class="stat"><b>${d.dist}</b><span>מרחק</span></div>
-      <div class="stat"><b>+${d.up}</b><span>עלייה</span></div>
-      <div class="stat"><b>-${d.down}</b><span>ירידה</span></div>
-    </div>
-    <div class="day-body">
-      ${d.sunsetWarning ? `<div class="sunset-warning">🌇 <b>שקיעה מוקדמת</b> — ${d.sunsetWarning}</div>` : ''}
-      <p>${d.text}</p>
-      <div class="day-links">
-        <a class="pill-link gmaps" target="_blank" href="${d.gmaps}">🧭 מסלול הליכה — Google Maps</a>
-        <a class="pill-link mapeak" target="_blank" href="${d.mapeak}">🗺️ GPX מלא — mapeak</a>
-        <button class="pill-link ics-btn" data-day="${d.n}">📅 הוסף ליומן</button>
-      </div>
-    </div>
-  </div>`;
-}).join('');
 
 /* ---------- ICS CALENDAR EXPORT ---------- */
 function pad(n){ return n<10 ? '0'+n : ''+n; }
@@ -601,23 +878,14 @@ function downloadICS(day){
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
-document.querySelectorAll('.ics-btn').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    const dayObj = days.find(d=>d.n===parseInt(btn.dataset.day));
-    if(dayObj) downloadICS(dayObj);
+try{
+  document.querySelectorAll('.ics-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const dayObj = days.find(d=>d.n===parseInt(btn.dataset.day));
+      if(dayObj) downloadICS(dayObj);
+    });
   });
-});
-
-/* ---------- SOS PANEL ---------- */
-const sosBtn = document.getElementById('sosBtn');
-const sosPanel = document.getElementById('sosPanel');
-const sosOverlay = document.getElementById('sosOverlay');
-const sosClose = document.getElementById('sosClose');
-function openSOS(){ sosPanel.classList.add('open'); sosOverlay.classList.add('open'); }
-function closeSOS(){ sosPanel.classList.remove('open'); sosOverlay.classList.remove('open'); }
-sosBtn.addEventListener('click', openSOS);
-sosClose.addEventListener('click', closeSOS);
-sosOverlay.addEventListener('click', closeSOS);
+}catch(e){ console.error('ics setup failed', e); }
 
 /* ---------- LODGING (SHARED STORAGE, EDITABLE) ---------- */
 const nights = [
@@ -626,6 +894,7 @@ const nights = [
   {id:3, label:"לילה 3", sub:"אחרי יום 3 · ליד נחל עמוד תחתון · שבת 14.11"}
 ];
 
+try{
 const nightsEl = document.getElementById('nightsCats');
 nightsEl.innerHTML = nights.map(n=>`
   <div class="night-card">
@@ -661,16 +930,6 @@ nightsEl.innerHTML = nights.map(n=>`
     </div>
   </div>
 `).join('');
-
-async function loadText(key){
-  try{
-    const r = await window.storage.get(key, true);
-    return r ? r.value : '';
-  }catch(e){ return ''; }
-}
-async function saveText(key, val){
-  try{ await window.storage.set(key, val, true); }catch(e){ console.error(e); }
-}
 
 function refreshNightStatus(n){
   const nameEl = document.querySelector(`[data-key="lodging:${n.id}:name"]`);
@@ -711,14 +970,25 @@ function updateLodgingShortcut(){
     : confirmedCount + "/" + nights.length + " עודכנו";
 }
 
-async function initLodgingFields(){
+function renderLodgingFields(){
   const fields = document.querySelectorAll('.field-editable[data-key]');
-  for(const field of fields){
+  fields.forEach(field=>{
+    // Don't overwrite text while someone is actively typing in this field
+    if(document.activeElement === field) return;
     const key = field.dataset.key;
-    const val = await loadText(key);
-    if(val) field.textContent = val;
+    const val = Store.get(key);
+    if(field.textContent.trim() !== val) field.textContent = val;
+  });
+  nights.forEach(refreshNightStatus);
+  updateLodgingShortcut();
+}
+
+function initLodgingFields(){
+  const fields = document.querySelectorAll('.field-editable[data-key]');
+  fields.forEach(field=>{
     field.addEventListener('blur', async ()=>{
-      await saveText(key, field.textContent.trim());
+      const key = field.dataset.key;
+      await Store.set(key, field.textContent.trim());
       const nId = parseInt(key.split(':')[1]);
       const nObj = nights.find(x=>x.id===nId);
       refreshNightStatus(nObj);
@@ -727,9 +997,9 @@ async function initLodgingFields(){
       flash.classList.add('show');
       setTimeout(()=>flash.classList.remove('show'), 1400);
     });
-  }
-  nights.forEach(refreshNightStatus);
-  updateLodgingShortcut();
+  });
+  renderLodgingFields();
+  Store.onChange(renderLodgingFields);
 }
 initLodgingFields();
 
@@ -737,6 +1007,70 @@ document.getElementById('lodgingShortcut').addEventListener('click', (e)=>{
   e.preventDefault();
   document.querySelector('nav button[data-view="lodging"]').click();
 });
+}catch(e){ console.error('lodging setup failed', e); }
+
+/* ---------- TRANSPORT: EXTRA CONTACTS (SHARED) ---------- */
+try{
+  const extraContactsEl = document.getElementById('extraContacts');
+  const addContactBtn = document.getElementById('addContactBtn');
+  const addContactForm = document.getElementById('addContactForm');
+  const nameInput = document.getElementById('newContactName');
+  const phoneInput = document.getElementById('newContactPhone');
+  const noteInput = document.getElementById('newContactNote');
+  const saveContactBtn = document.getElementById('saveContactBtn');
+  const cancelContactBtn = document.getElementById('cancelContactBtn');
+
+  function getContacts(){
+    try{ const raw = Store.get('transport:contacts'); return raw ? JSON.parse(raw) : []; }
+    catch(e){ return []; }
+  }
+
+  function renderExtraContacts(){
+    const list = getContacts();
+    extraContactsEl.innerHTML = list.map((c, i)=>`
+      <div class="contact-card contact-card-sm">
+        <button type="button" class="contact-remove" data-idx="${i}">✕</button>
+        <h2>${c.name || 'ללא שם'}</h2>
+        ${c.note ? `<div class="sub">${c.note}</div>` : ''}
+        ${c.phone ? `<a class="call-btn" href="tel:${c.phone.replace(/[^0-9+]/g,'')}">📞 חיוג — ${c.phone}</a>` : ''}
+      </div>
+    `).join('');
+    extraContactsEl.querySelectorAll('.contact-remove').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        const idx = parseInt(btn.dataset.idx);
+        const current = getContacts();
+        current.splice(idx, 1);
+        await Store.set('transport:contacts', JSON.stringify(current));
+      });
+    });
+  }
+
+  addContactBtn.addEventListener('click', ()=>{
+    addContactForm.style.display = 'block';
+    addContactBtn.style.display = 'none';
+    nameInput.focus();
+  });
+  cancelContactBtn.addEventListener('click', ()=>{
+    addContactForm.style.display = 'none';
+    addContactBtn.style.display = 'block';
+    nameInput.value = ''; phoneInput.value = ''; noteInput.value = '';
+  });
+  saveContactBtn.addEventListener('click', async ()=>{
+    const name = nameInput.value.trim();
+    const phone = phoneInput.value.trim();
+    const note = noteInput.value.trim();
+    if(!name && !phone) return;
+    const current = getContacts();
+    current.push({name, phone, note});
+    await Store.set('transport:contacts', JSON.stringify(current));
+    nameInput.value = ''; phoneInput.value = ''; noteInput.value = '';
+    addContactForm.style.display = 'none';
+    addContactBtn.style.display = 'block';
+  });
+
+  renderExtraContacts();
+  Store.onChange(renderExtraContacts);
+}catch(e){ console.error('transport contacts setup failed', e); }
 
 /* ---------- GEAR (SHARED STORAGE) ---------- */
 const gearData = [
@@ -777,16 +1111,7 @@ const beforeItems = [
 
 function slug(s){ return s.replace(/[^א-תa-zA-Z0-9]/g,'').slice(0,24); }
 
-async function loadChecked(key){
-  try{
-    const r = await window.storage.get(key, true);
-    return r && r.value === '1';
-  }catch(e){ return false; }
-}
-async function setChecked(key, val){
-  try{ await window.storage.set(key, val ? '1':'0', true); }catch(e){ console.error(e); }
-}
-
+try{
 const gearCatsEl = document.getElementById('gearCats');
 const gearProgressEl = document.getElementById('gearProgress');
 const beforeListEl = document.getElementById('beforeList');
@@ -818,22 +1143,31 @@ function buildGearDOM(){
 }
 buildGearDOM();
 
-async function initCheckboxState(){
-  const boxes = document.querySelectorAll('input[type=checkbox][data-key]');
-  allCheckboxes = Array.from(boxes);
-  for(const box of allCheckboxes){
+function renderCheckboxState(){
+  allCheckboxes.forEach(box=>{
     const key = box.dataset.key;
-    const checked = await loadChecked(key);
+    const checked = Store.get(key) === '1';
     box.checked = checked;
     const label = document.querySelector('label[for="'+box.id+'"]');
-    if(checked && label) label.classList.add('checked');
+    if(label) label.classList.toggle('checked', checked);
+  });
+  updateProgress();
+}
+
+function initCheckboxState(){
+  const boxes = document.querySelectorAll('input[type=checkbox][data-key]');
+  allCheckboxes = Array.from(boxes);
+  allCheckboxes.forEach(box=>{
+    const key = box.dataset.key;
     box.addEventListener('change', async ()=>{
-      await setChecked(key, box.checked);
+      await Store.set(key, box.checked ? '1':'0');
+      const label = document.querySelector('label[for="'+box.id+'"]');
       if(label) label.classList.toggle('checked', box.checked);
       updateProgress();
     });
-  }
-  updateProgress();
+  });
+  renderCheckboxState();
+  Store.onChange(renderCheckboxState);
 }
 
 function updateProgress(){
@@ -849,17 +1183,8 @@ function updateProgress(){
 }
 
 initCheckboxState();
+}catch(e){ console.error('gear setup failed', e); }
 
-/* ---------- NAV ---------- */
-document.querySelectorAll('nav button').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
-    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById(btn.dataset.view).classList.add('active');
-    window.scrollTo({top:0, behavior:'smooth'});
-  });
-});
 </script>
 </body>
 </html>
