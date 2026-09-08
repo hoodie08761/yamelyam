@@ -350,12 +350,14 @@
   .field-row:last-child{margin-bottom:0;}
   .field-label{font-size:11px; color:#6C8481; font-weight:700; margin-bottom:5px; display:block;}
   .field-editable{
+    display:block; width:100%; box-sizing:border-box;
     border:1px solid var(--line); border-radius:10px; padding:10px 12px;
     font-size:14px; font-family:'Heebo',sans-serif; background:var(--paper);
-    min-height:20px; outline:none; color:var(--ink);
+    outline:none; color:var(--ink);
   }
-  .field-editable:empty::before{content:attr(data-placeholder); color:#8FA6A4;}
+  .field-editable::placeholder{color:#8FA6A4;}
   .field-editable:focus{border-color:var(--clay); background:#fff;}
+  textarea.field-editable{resize:vertical; min-height:44px;}
   .night-actions{display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;}
   .saved-flash{font-size:11px; color:var(--olive); opacity:0; transition:opacity .3s;}
   .saved-flash.show{opacity:1;}
@@ -1106,23 +1108,28 @@ nightsEl.innerHTML = nights.map(n=>`
     <div class="night-body">
       <div class="field-row">
         <span class="field-label">שם המקום</span>
-        <div class="field-editable" contenteditable="true" data-key="lodging:${n.id}:name" data-placeholder="לדוגמה: אכסניית ..."></div>
+        <input type="text" class="field-editable" data-key="lodging:${n.id}:name" placeholder="לדוגמה: אכסניית ...">
       </div>
       <div class="field-row">
         <span class="field-label">טלפון</span>
-        <div class="field-editable" contenteditable="true" data-key="lodging:${n.id}:phone" data-placeholder="05X-XXXXXXX"></div>
+        <input type="tel" class="field-editable" data-key="lodging:${n.id}:phone" placeholder="05X-XXXXXXX">
       </div>
       <div class="field-row">
-        <span class="field-label">קישור (אתר / הזמנה / Waze)</span>
-        <div class="field-editable" contenteditable="true" data-key="lodging:${n.id}:link" data-placeholder="https://..."></div>
+        <span class="field-label">קישור (אתר / הזמנה)</span>
+        <input type="url" class="field-editable" data-key="lodging:${n.id}:link" placeholder="https://..." autocapitalize="none" autocorrect="off" spellcheck="false">
+      </div>
+      <div class="field-row">
+        <span class="field-label">קישור Waze</span>
+        <input type="url" class="field-editable" data-key="lodging:${n.id}:waze" placeholder="https://waze.com/ul/..." autocapitalize="none" autocorrect="off" spellcheck="false">
       </div>
       <div class="field-row">
         <span class="field-label">הערות</span>
-        <div class="field-editable" contenteditable="true" data-key="lodging:${n.id}:notes" data-placeholder="מחיר, סטטוס תשלום, שעת צ׳ק־אין..."></div>
+        <textarea class="field-editable" data-key="lodging:${n.id}:notes" placeholder="מחיר, סטטוס תשלום, שעת צ׳ק־אין..." rows="2"></textarea>
       </div>
       <div class="night-actions">
         <a class="pill-link" id="call_${n.id}" href="#" style="pointer-events:none; opacity:.4;">📞 חיוג</a>
         <a class="pill-link" id="open_${n.id}" href="#" target="_blank" style="pointer-events:none; opacity:.4;">🔗 פתח קישור</a>
+        <a class="pill-link gmaps" id="waze_${n.id}" href="#" target="_blank" style="pointer-events:none; opacity:.4;">🧭 פתח בוויז</a>
         <span class="saved-flash" id="flash_${n.id}">נשמר ✓</span>
       </div>
     </div>
@@ -1133,28 +1140,36 @@ function refreshNightStatus(n){
   const nameEl = document.querySelector(`[data-key="lodging:${n.id}:name"]`);
   const phoneEl = document.querySelector(`[data-key="lodging:${n.id}:phone"]`);
   const linkEl = document.querySelector(`[data-key="lodging:${n.id}:link"]`);
+  const wazeEl = document.querySelector(`[data-key="lodging:${n.id}:waze"]`);
   const statusEl = document.getElementById('status_'+n.id);
   const callBtn = document.getElementById('call_'+n.id);
   const openBtn = document.getElementById('open_'+n.id);
+  const wazeBtn = document.getElementById('waze_'+n.id);
 
-  const hasName = nameEl.textContent.trim().length>0;
+  const hasName = nameEl.value.trim().length>0;
   statusEl.textContent = hasName ? "עודכן" : "טרם נקבע";
   statusEl.className = "status-tag " + (hasName ? "confirmed" : "tbd");
 
-  const phone = phoneEl.textContent.trim();
+  const phone = phoneEl.value.trim();
   if(phone){
     callBtn.href = "tel:"+phone.replace(/[^0-9+]/g,'');
     callBtn.style.pointerEvents = "auto"; callBtn.style.opacity = "1";
   } else {
     callBtn.style.pointerEvents = "none"; callBtn.style.opacity = ".4";
   }
-  const link = linkEl.textContent.trim();
-  if(link){
-    openBtn.href = link.startsWith('http') ? link : 'https://'+link;
-    openBtn.style.pointerEvents = "auto"; openBtn.style.opacity = "1";
-  } else {
-    openBtn.style.pointerEvents = "none"; openBtn.style.opacity = ".4";
+
+  function wireLinkBtn(fieldEl, btn, storeSuffix){
+    const focused = document.activeElement === fieldEl;
+    const val = focused ? fieldEl.value.trim() : (Store.get(`lodging:${n.id}:${storeSuffix}`)||'').trim();
+    if(val){
+      btn.href = val.startsWith('http') ? val : 'https://'+val;
+      btn.style.pointerEvents = "auto"; btn.style.opacity = "1";
+    } else {
+      btn.style.pointerEvents = "none"; btn.style.opacity = ".4";
+    }
   }
+  wireLinkBtn(linkEl, openBtn, 'link');
+  wireLinkBtn(wazeEl, wazeBtn, 'waze');
 }
 
 function updateLodgingShortcut(){
@@ -1168,6 +1183,16 @@ function updateLodgingShortcut(){
     : confirmedCount + "/" + nights.length + " עודכנו";
 }
 
+function friendlyUrl(raw){
+  if(!raw) return raw;
+  try{
+    const u = new URL(raw.startsWith('http')? raw : 'https://'+raw);
+    const host = u.hostname.replace(/^www\./,'');
+    if(host.includes('waze')) return '🧭 מיקום ב-Waze';
+    return '🔗 '+host;
+  }catch(e){ return raw; }
+}
+
 function renderLodgingFields(){
   const fields = document.querySelectorAll('.field-editable[data-key]');
   fields.forEach(field=>{
@@ -1175,7 +1200,9 @@ function renderLodgingFields(){
     if(document.activeElement === field) return;
     const key = field.dataset.key;
     const val = Store.get(key);
-    if(field.textContent.trim() !== val) field.textContent = val;
+    const isLink = key.endsWith(':link') || key.endsWith(':waze');
+    const displayVal = isLink? friendlyUrl(val) : val;
+    if(field.value.trim() !== (displayVal||'').trim()) field.value = displayVal||'';
   });
   nights.forEach(refreshNightStatus);
   updateLodgingShortcut();
@@ -1184,9 +1211,24 @@ function renderLodgingFields(){
 function initLodgingFields(){
   const fields = document.querySelectorAll('.field-editable[data-key]');
   fields.forEach(field=>{
+    const isLink = field.dataset.key.endsWith(':link') || field.dataset.key.endsWith(':waze');
+    if(isLink){
+      field.addEventListener('focus', ()=>{
+        // show the real raw URL for editing
+        field.value = Store.get(field.dataset.key) || '';
+      });
+    }
+    field.addEventListener('input', ()=>{
+      const key = field.dataset.key;
+      const nId = parseInt(key.split(':')[1]);
+      const nObj = nights.find(x=>x.id===nId);
+      if(nObj) refreshNightStatus(nObj);
+    });
     field.addEventListener('blur', async ()=>{
       const key = field.dataset.key;
-      await Store.set(key, field.textContent.trim());
+      const raw = field.value.trim();
+      await Store.set(key, raw);
+      if(isLink) field.value = friendlyUrl(raw);
       const nId = parseInt(key.split(':')[1]);
       const nObj = nights.find(x=>x.id===nId);
       refreshNightStatus(nObj);
