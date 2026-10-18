@@ -783,6 +783,26 @@
   <div class="sos-note">במקרה חירום אמיתי — קודם כל 100 או 101. שתפו את המיקום המדויק שלכם אם יש קליטה.</div>
 </div>
 
+<!-- ROUTE EDIT MODAL -->
+<div class="overlay" id="routeEditOverlay" onclick="if(event.target===this)closeRouteEdit()">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <h2 id="reTitle">עריכת מסלול</h2>
+    <div class="field"><label>מוצא</label><input type="text" id="reFrom"></div>
+    <div class="field"><label>יעד</label><input type="text" id="reTo"></div>
+    <div class="field"><label>מרחק (למשל 13.3 ק״מ)</label><input type="text" id="reDist"></div>
+    <div class="field"><label>עלייה (מטר, למשל 522)</label><input type="text" id="reUp"></div>
+    <div class="field"><label>ירידה (מטר, למשל 56)</label><input type="text" id="reDown"></div>
+    <div class="field"><label>תקציר היום (מוצג בראש הפירוט)</label><textarea id="reIntro" rows="3"></textarea></div>
+    <div class="field"><label>קישור Google Maps (לא חובה)</label><input type="url" id="reGmaps" autocapitalize="none" autocorrect="off"></div>
+    <div class="field"><label>קישור GPX / mapeak (לא חובה)</label><input type="url" id="reMapeak" autocapitalize="none" autocorrect="off"></div>
+    <div class="small-note">השינויים נשמרים לכל הקבוצה. השלבים המפורטים (ציר הזמן) לא נערכים כאן.</div>
+    <div class="btn" onclick="saveRouteEdit()">שמור</div>
+    <div class="btn ghost" onclick="resetRouteEdit()">החזר לברירת המחדל</div>
+    <div class="btn ghost" onclick="closeRouteEdit()">ביטול</div>
+  </div>
+</div>
+
 <footer>נבנה עבור קבוצת הטיול · הנתונים בטאבים "לינה" ו"הסעה" משותפים לכולם
   <div style="margin-top:6px; display:flex; align-items:center; justify-content:center; gap:5px; font-size:11px; color:#8FA6A4;">
     <img src="data:image/png;base64,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" alt="SM" style="width:14px; height:14px; object-fit:contain; flex-shrink:0;">
@@ -838,7 +858,7 @@ const Store = {
     // to show immediately, even before Firebase connects (or if it never does).
     try{
       for(const key of Object.keys(localStorage)){
-        if(key.startsWith('gear:') || key.startsWith('before:') || key.startsWith('lodging:') || key.startsWith('transport:')){
+        if(key.startsWith('gear:') || key.startsWith('before:') || key.startsWith('lodging:') || key.startsWith('transport:') || key.startsWith('route:')){
           this.cache[key] = localStorage.getItem(key);
         }
       }
@@ -1017,7 +1037,7 @@ const DAY_STORY = {
 function storyHTML(d){
   const s = DAY_STORY[d.n];
   if(!s) return '<p>'+d.text+'</p>';
-  return '<div class="story-intro">'+s.intro+'</div><ul class="timeline">' +
+  return '<div class="story-intro">'+(d.intro||s.intro)+'</div><ul class="timeline">' +
     s.steps.map(function(st){ return '<li class="'+(st.type||'info')+'"><span class="tl-dot"></span><div class="tl-k">'+st.k+'</div><div class="tl-t">'+st.t+'</div></li>'; }).join('') +
     '</ul>';
 }
@@ -1052,6 +1072,18 @@ function miniMapSVG(d){
     '<text x="46" y="86" text-anchor="middle" font-size="10" font-weight="800" fill="#0F3D3E" font-family="Heebo,sans-serif">'+d.dist+'</text>' +
     '</svg>';
 }
+
+/* ---------- ROUTE EDITS (shared via Store; base data kept so "reset" works) ---------- */
+const ROUTE_BASE = days.map(d=>Object.assign({}, d));
+function applyRouteOverrides(){
+  days.forEach(d=>{
+    const base = ROUTE_BASE.find(b=>b.n===d.n);
+    Object.keys(base).forEach(k=>{ d[k] = base[k]; });
+    const raw = Store.get('route:'+d.n);
+    if(raw){ try{ Object.assign(d, JSON.parse(raw)); }catch(e){} }
+  });
+}
+applyRouteOverrides();
 
 /* ---------- RENDER ROUTE ---------- */
 function sameDay(a,b){
@@ -1115,6 +1147,7 @@ try{
           <a class="pill-link gmaps" target="_blank" href="${d.gmaps}">🧭 מסלול הליכה — Google Maps</a>
           <a class="pill-link mapeak" target="_blank" href="${d.mapeak}">🗺️ GPX מלא — mapeak</a>
           <button class="pill-link ics-btn" data-day="${d.n}">📅 הוסף ליומן</button>
+          <button class="pill-link" onclick="openRouteEdit(${d.n})">✏️ ערוך מסלול</button>
         </div>
       </div>
     </div>`;
@@ -1226,7 +1259,7 @@ function downloadICS(day){
   const nextDay = new Date(day.date); nextDay.setDate(nextDay.getDate()+1);
   const dtEnd = toICSDate(nextDay);
   const uid = "yamelyam-day"+day.n+"@trip";
-  const desc = (day.text+"").replace(/\n/g,'\\n').replace(/,/g,'\\,');
+  const desc = ((day.intro||day.text)+"").replace(/\n/g,'\\n').replace(/,/g,'\\,');
   const ics = [
     "BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Yam El Yam Trip//HE",
     "BEGIN:VEVENT",
@@ -2141,6 +2174,58 @@ ttRenderHome();
 ttRenderCalendar();
 
 }catch(e){ console.error('training tab setup failed', e); }
+})();
+</script>
+<script>
+/* ---------- route editing ---------- */
+let reDayN = null;
+function openRouteEdit(n){
+  const d = days.find(x=>x.n===n); if(!d) return;
+  reDayN = n;
+  document.getElementById('reTitle').textContent = 'עריכת יום '+n;
+  document.getElementById('reFrom').value = d.from||'';
+  document.getElementById('reTo').value = d.to||'';
+  document.getElementById('reDist').value = d.dist||'';
+  document.getElementById('reUp').value = (d.up||'').replace(/[^0-9]/g,'');
+  document.getElementById('reDown').value = (d.down||'').replace(/[^0-9]/g,'');
+  document.getElementById('reIntro').value = d.intro || (DAY_STORY[n]&&DAY_STORY[n].intro) || d.text || '';
+  document.getElementById('reGmaps').value = d.gmaps||'';
+  document.getElementById('reMapeak').value = d.mapeak||'';
+  document.getElementById('routeEditOverlay').classList.add('open');
+}
+function closeRouteEdit(){ document.getElementById('routeEditOverlay').classList.remove('open'); }
+async function saveRouteEdit(){
+  if(reDayN==null) return;
+  const v = id => document.getElementById(id).value.trim();
+  const base = ROUTE_BASE.find(b=>b.n===reDayN);
+  const upNum = v('reUp'), downNum = v('reDown');
+  const data = {
+    from: v('reFrom') || base.from,
+    to: v('reTo') || base.to,
+    dist: v('reDist') || base.dist,
+    up: upNum ? upNum+' מ׳' : base.up,
+    down: downNum ? downNum+' מ׳' : base.down,
+    intro: v('reIntro'),
+    gmaps: v('reGmaps') || base.gmaps,
+    mapeak: v('reMapeak') || base.mapeak
+  };
+  await Store.set('route:'+reDayN, JSON.stringify(data));
+  location.reload();
+}
+async function resetRouteEdit(){
+  if(reDayN==null) return;
+  if(!confirm('להחזיר את היום הזה לברירת המחדל?')) return;
+  await Store.set('route:'+reDayN, '');
+  location.reload();
+}
+/* another phone changed the route: refresh once so everyone sees it */
+(function(){
+  function routeSig(){ return [1,2,3,4].map(n=>Store.get('route:'+n)).join('|'); }
+  sessionStorage.setItem('route_sig', routeSig());
+  Store.onChange(function(){
+    const s = routeSig();
+    if(s !== sessionStorage.getItem('route_sig')){ sessionStorage.setItem('route_sig', s); location.reload(); }
+  });
 })();
 </script>
 <script>
