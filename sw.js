@@ -5,7 +5,7 @@
 // - Firestore / weather API requests are never intercepted (the app handles those offline itself)
 // Bump VERSION whenever this file changes so old caches are cleaned up.
 
-const VERSION = 'v4';
+const VERSION = 'v5';
 const CORE = 'ye-core-' + VERSION;
 const RUNTIME = 'ye-runtime-' + VERSION;
 const CORE_URLS = ['./', './index.html', './manifest.json'];
