@@ -426,6 +426,18 @@
     display:inline-flex; align-items:center; gap:12px; margin-top:12px; position:relative; z-index:1;
     background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.42); border-radius:16px; padding:8px 18px;
   }
+  .cd-cal-btn{display:block; margin:10px auto 0; background:#fff; color:var(--olive-dk); border:none; border-radius:999px; padding:9px 18px; font-size:13px; font-weight:800; font-family:'Heebo',sans-serif; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,.18); position:relative; z-index:1;}
+  /* ===== header layout: countdown + weather first, then three equal action buttons ===== */
+  .hdr-count{display:flex; justify-content:center; margin-top:14px; position:relative; z-index:1;}
+  .hdr-count .countdown-hero{margin-top:0;}
+  .hdr-weather{display:flex; justify-content:center; margin-top:12px; position:relative; z-index:1;}
+  .hdr-weather .weather-pill{width:100%; max-width:340px; justify-content:center; box-sizing:border-box; font-size:15px; font-weight:700; padding:10px 16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-decoration:none; color:inherit;}
+  .hdr-actions{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; max-width:400px; margin:12px auto 0; position:relative; z-index:1;}
+  .hdr-btn{display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; min-height:60px; padding:8px 6px; border-radius:14px; background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.42); color:#fff; font-size:12.5px; font-weight:800; line-height:1.3; text-align:center; text-decoration:none; cursor:pointer; font-family:'Heebo',sans-serif; box-sizing:border-box; box-shadow:0 2px 8px rgba(0,0,0,.14);}
+  .hdr-btn .ico{font-size:20px; line-height:1;}
+  .hdr-btn:active{opacity:.85;}
+  .hdr-today{display:flex; justify-content:center; margin-top:10px; position:relative; z-index:1;}
+  .hdr-today .today-pill{margin-top:0; font-size:12.5px;}
   .cd-big{font-family:'Frank Ruhl Libre',serif; font-size:46px; font-weight:900; line-height:1; color:#fff; text-shadow:0 2px 10px rgba(0,0,0,.28);}
   .cd-meta{display:flex; flex-direction:column; line-height:1.3;}
   .cd-meta b{font-size:17px; font-weight:900;}
@@ -541,6 +553,9 @@
   .overlay .field input, .overlay .field textarea{width:100%; box-sizing:border-box; padding:10px 12px; border-radius:10px; border:1px solid var(--line); background:var(--paper-2); color:var(--ink); font-family:inherit; font-size:15px;}
   .overlay .btn{display:block; width:100%; box-sizing:border-box; text-align:center; background:var(--olive); color:#fff; padding:13px; border-radius:14px; font-size:16px; font-weight:700; margin-top:12px; cursor:pointer; border:1px solid var(--olive);}
   .overlay .sheet-actions{position:sticky; bottom:-26px; background:#fff; padding:8px 0 10px; margin:6px -18px -26px; padding-left:18px; padding-right:18px; border-top:1px solid var(--line);}
+  .toast{position:fixed; bottom:96px; left:0; right:0; display:flex; justify-content:center; z-index:350; pointer-events:none; padding:0 16px;}
+  .toast span{background:var(--olive-dk); color:#fff; padding:10px 18px; border-radius:999px; font-size:13px; font-weight:600; opacity:0; transform:translateY(10px); transition:.25s; text-align:center;}
+  .toast span.show{opacity:1; transform:translateY(0);}
   .overlay .btn.ghost{background:#fff; color:var(--ink); border:1px solid var(--line);}
 </style>
 </head>
@@ -552,13 +567,18 @@
   <div class="eyebrow">גליל עליון · הרי מירון</div>
   <h1>ים אל ים</h1>
   <div class="subline">חוף אכזיב ← אבירים ← הר מירון ← נחל עמוד ← כנרת · 4 ימים</div>
-  <div class="countdown-hero" id="countdownHero"><div class="cd-big" id="cdBig">–</div><div class="cd-meta"><b id="cdLabel">ימים ליציאה</b><span id="cdDate">חמישי · 12.11.2026</span></div></div>
-  <div class="top-row">
-    <div class="today-pill" id="todayPill">טוען תאריך…</div>
-    <div class="weather-pill" id="weatherPill">🌤️ טוען מזג אוויר…</div>
-    <a class="weather-pill share-pill" id="sharePill" href="https://chat.whatsapp.com/JUUvmHf2yGM5JRUjQqMEoN" target="_blank" rel="noopener">📍 שיתוף מיקום</a>
+
+  <div class="hdr-count"><div class="countdown-hero" id="countdownHero"><div class="cd-big" id="cdBig">–</div><div class="cd-meta"><b id="cdLabel">ימים ליציאה</b><span id="cdDate">חמישי · 12.11.2026</span></div></div></div>
+
+  <div class="hdr-weather"><div class="weather-pill" id="weatherPill">🌤️ טוען מזג אוויר…</div></div>
+
+  <div class="hdr-actions">
+    <a class="hdr-btn" id="sharePill" href="https://chat.whatsapp.com/JUUvmHf2yGM5JRUjQqMEoN" target="_blank" rel="noopener"><span class="ico">📍</span>שיתוף מיקום</a>
+    <button class="hdr-btn" id="cdCalBtn" type="button"><span class="ico">📅</span>הוסף ליומן</button>
+    <a href="#" class="hdr-btn" id="lodgingShortcut"><span class="ico">🛏️</span>לינה · <span id="lodgingShortcutStatus">טרם נקבע</span></a>
   </div>
-  <a href="#" class="lodging-shortcut" id="lodgingShortcut">🛏️ מקומות לינה — <span id="lodgingShortcutStatus">טרם נקבע</span> ›</a>
+
+  <div class="hdr-today"><div class="today-pill" id="todayPill">טוען תאריך…</div></div>
 </header>
 
 <noscript>
@@ -797,6 +817,7 @@
   <div class="sos-note">במקרה חירום אמיתי — קודם כל 100 או 101. שתפו את המיקום המדויק שלכם אם יש קליטה.</div>
 </div>
 
+<div class="toast"><span id="toastMsg"></span></div>
 <!-- ROUTE EDIT MODAL -->
 <div class="overlay" id="routeEditOverlay" onclick="if(event.target===this)closeRouteEdit()">
   <div class="sheet">
@@ -2255,6 +2276,58 @@ async function resetRouteEdit(){
   Store.onChange(function(){
     if(window.__routeSaving) return;
     if(routeSig() !== shownSig) showBar();
+  });
+})();
+</script>
+<script>
+/* ---------- toast message (used by several buttons) ---------- */
+function showToast(msg){
+  const t = document.getElementById('toastMsg'); if(!t) return;
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+/* ---------- countdown calendar file (generated at click time, days counted from the clicking day) ---------- */
+(function(){
+  const TRIP = new Date(2026, 10, 12);
+  function pad(n){ return n<10 ? '0'+n : ''+n; }
+  function stamp(d){ return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'T'+pad(d.getHours())+pad(d.getMinutes())+'00'; }
+  document.getElementById('cdCalBtn').addEventListener('click', function(){
+    const today = new Date(); today.setHours(0,0,0,0);
+    const trip = new Date(TRIP); trip.setHours(0,0,0,0);
+    if(today > trip){ showToast('הטיול כבר התחיל או הסתיים'); return; }
+    const lines = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Yam El Yam//Countdown//HE','CALSCALE:GREGORIAN'];
+    const stampNow = stamp(new Date());
+    for(let d = new Date(today); d <= trip; d = new Date(d.getFullYear(), d.getMonth(), d.getDate()+1)){
+      const left = Math.round((trip - d) / 86400000);
+      const title = left === 0 ? 'היום יוצאים! 🎒 — ים אל ים' : 'נותרו '+left+(left===1?' יום':' ימים')+' ליציאה — ים אל ים';
+      const s = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 8, 0, 0);
+      const e = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 8, 15, 0);
+      lines.push('BEGIN:VEVENT',
+        'UID:yamelyam-countdown-'+d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'@yamelyam',
+        'DTSTAMP:'+stampNow,
+        'DTSTART:'+stamp(s),
+        'DTEND:'+stamp(e),
+        'SUMMARY:'+title,
+        'DESCRIPTION:פתח את האפליקציה לפרטי המסלול והאימונים.',
+        'BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+title,'TRIGGER:PT0M','END:VALARM',
+        'END:VEVENT');
+    }
+    lines.push('END:VCALENDAR');
+    const blob = new Blob([lines.join('\r\n')+'\r\n'], {type:'text/calendar;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    // iPhone/iPad Safari: opening the calendar file directly shows the "Add to Calendar" sheet.
+    // Other browsers: download the file, then open it to import.
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    if(isIOS){
+      window.location.href = url;
+    } else {
+      const a = document.createElement('a');
+      a.href = url; a.download = 'yam-el-yam-countdown.ics';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    }
+    setTimeout(()=>URL.revokeObjectURL(url), 60000);
+    showToast(isIOS ? 'נפתח חלון הוספה ליומן 📅' : 'הקובץ נוצר — פתח אותו להוספה ליומן 📅');
   });
 })();
 </script>
