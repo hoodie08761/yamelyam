@@ -2325,113 +2325,52 @@ function showToast(msg){
   clearTimeout(window.__toastTimer);
   window.__toastTimer = setTimeout(()=>t.classList.remove('show'), 2200);
 }
-/* ---------- countdown calendar file (generated at click time, days counted from the clicking day) ---------- */
+/* ---------- calendar file: countdown (08:00 until the trip) + one trip-day reminder per planned day (07:00) ---------- */
 (function(){
   const TRIP = new Date(2026, 10, 12);
   function pad(n){ return n<10 ? '0'+n : ''+n; }
   function stamp(d){ return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'T'+pad(d.getHours())+pad(d.getMinutes())+'00'; }
+  function dayKey(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+  function ev(uid, date, hh, mm, title, desc){
+    const s = new Date(date.getFullYear(), date.getMonth(), date.getDate(), hh, mm, 0);
+    const e = new Date(s.getTime() + 15*60000);
+    return ['BEGIN:VEVENT','UID:'+uid+'@yamelyam','DTSTAMP:'+stamp(new Date()),'DTSTART:'+stamp(s),'DTEND:'+stamp(e),
+      'SUMMARY:'+title,'DESCRIPTION:'+desc,
+      'BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+title,'TRIGGER:PT0M','END:VALARM','END:VEVENT'];
+  }
   document.getElementById('cdCalBtn').addEventListener('click', function(){
     const today = new Date(); today.setHours(0,0,0,0);
     const trip = new Date(TRIP); trip.setHours(0,0,0,0);
-    if(today > trip){ showToast('הטיול כבר התחיל או הסתיים'); return; }
-    const lines = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Yam El Yam//Countdown//HE','CALSCALE:GREGORIAN'];
-    const stampNow = stamp(new Date());
+    const lastDay = new Date(2026, 10, 15);
+    if(today > lastDay){ showToast('הטיול כבר הסתיים'); return; }
+    const lines = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Yam El Yam//Trip//HE','CALSCALE:GREGORIAN'];
+    // 1) countdown, every day from today until departure (08:00)
     for(let d = new Date(today); d <= trip; d = new Date(d.getFullYear(), d.getMonth(), d.getDate()+1)){
       const left = Math.round((trip - d) / 86400000);
       const title = left === 0 ? 'היום יוצאים! 🎒 — ים אל ים' : 'נותרו '+left+(left===1?' יום':' ימים')+' ליציאה — ים אל ים';
-      const s = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 8, 0, 0);
-      const e = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 8, 15, 0);
-      lines.push('BEGIN:VEVENT',
-        'UID:yamelyam-countdown-'+d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'@yamelyam',
-        'DTSTAMP:'+stampNow,
-        'DTSTART:'+stamp(s),
-        'DTEND:'+stamp(e),
-        'SUMMARY:'+title,
-        'DESCRIPTION:פתח את האפליקציה לפרטי המסלול והאימונים.',
-        'BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+title,'TRIGGER:PT0M','END:VALARM',
-        'END:VEVENT');
+      lines.push(...ev('yamelyam-countdown-'+dayKey(d), d, 8, 0, title, 'פתח את האפליקציה לפרטי המסלול והאימונים.'));
     }
+    // 2) trip days (07:00): planned distance of each day, taken from the route as it is now (including edits)
+    days.forEach(dd=>{
+      if(dd.date < today) return;
+      const title = 'יום מס '+dd.n+' מתוכנן '+dd.dist+' — בהצלחה לכם 🥇';
+      lines.push(...ev('yamelyam-trip-day-'+dd.n+'-'+dayKey(dd.date), dd.date, 7, 0, title, dd.from+' ← '+dd.to+'. פתח את האפליקציה לפרטי היום.'));
+    });
     lines.push('END:VCALENDAR');
     const blob = new Blob([lines.join('\r\n')+'\r\n'], {type:'text/calendar;charset=utf-8'});
     const url = URL.createObjectURL(blob);
-    // iPhone/iPad Safari: opening the calendar file directly shows the "Add to Calendar" sheet.
-    // Other browsers: download the file, then open it to import.
+    // iPhone Safari: open the calendar sheet directly. Other browsers: download the file.
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     if(isIOS){
       window.location.href = url;
     } else {
       const a = document.createElement('a');
-      a.href = url; a.download = 'yam-el-yam-countdown.ics';
+      a.href = url; a.download = 'yam-el-yam-calendar.ics';
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
     }
     setTimeout(()=>URL.revokeObjectURL(url), 60000);
     showToast(isIOS ? 'נפתח חלון הוספה ליומן 📅' : 'הקובץ נוצר — פתח אותו להוספה ליומן 📅');
   });
-})();
-</script>
-<script>
-/* ---------- shared expenses (kupa): one key per expense, so devices never overwrite each other ---------- */
-(function(){
-  const PFX = 'kupa:e:';
-  function fmt(c){ return (c/100).toFixed(2).replace(/\.00$/,'') + ' ₪'; }
-  function esc(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-  function getEntries(){
-    return Object.keys(Store.cache).filter(k=>k.startsWith(PFX)).map(k=>Store.get(k)).filter(Boolean)
-      .map(s=>{ try{ return JSON.parse(s); }catch(e){ return null; } }).filter(Boolean)
-      .sort((a,b)=>a.ts-b.ts);
-  }
-  function render(){
-    const list = getEntries();
-    const balEl = document.getElementById('kpBalance');
-    const listEl = document.getElementById('kpList');
-    if(!list.length){
-      balEl.innerHTML = '<div class="kp-empty">עדיין אין הוצאות.</div>';
-      listEl.innerHTML = '';
-      return;
-    }
-    const paid = {};
-    let total = 0;
-    list.forEach(e=>{ paid[e.payer] = (paid[e.payer]||0) + e.cents; total += e.cents; });
-    const rows = Object.keys(paid).sort((a,b)=>paid[b]-paid[a]).map(n=>
-      '<div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--line);"><span>'+esc(n)+'</span><b>'+fmt(paid[n])+'</b></div>'
-    ).join('');
-    balEl.innerHTML = '<div style="font-weight:800; margin-bottom:4px;">כמה שילם כל אחד</div>' + rows +
-      '<div style="display:flex; justify-content:space-between; padding-top:8px; font-weight:800;"><span>סה״כ</span><span>'+fmt(total)+'</span></div>';
-    listEl.innerHTML = list.slice().reverse().map(e=>
-      '<div class="kp-item"><div><b>'+esc(e.payer)+'</b> שילם <b>'+fmt(e.cents)+'</b> — '+esc(e.what||'ללא תיאור')+'</div>'+
-      '<button class="kp-del" onclick="kupaDelete(\''+e.id+'\')" aria-label="מחק">🗑️</button></div>'
-    ).join('');
-  }
-  window.kupaAdd = async function(){
-    const payer = document.getElementById('kpPayer').value.trim();
-    const amount = parseFloat(document.getElementById('kpAmount').value);
-    const what = document.getElementById('kpWhat').value.trim();
-    if(!payer){ showToast('כתוב מי שילם'); return; }
-    if(!(amount>0)){ showToast('כתוב סכום גדול מ-0'); return; }
-    const entry = {id: Date.now().toString(36)+Math.random().toString(36).slice(2,6), payer, cents: Math.round(amount*100), what, ts: Date.now()};
-    await Store.set(PFX+entry.id, JSON.stringify(entry));
-    document.getElementById('kpAmount').value=''; document.getElementById('kpWhat').value='';
-    showToast('ההוצאה נוספה 💸');
-    render();
-  };
-  window.kupaDelete = async function(id){
-    if(!confirm('למחוק את ההוצאה?')) return;
-    await Store.set(PFX+id, '');   // empty value = deleted; other devices see the same
-    showToast('ההוצאה נמחקה');
-    render();
-  };
-  // migrate the single-list version (if anyone already added entries with it)
-  (async function migrate(){
-    const raw = Store.get('kupa:list');
-    if(!raw) return;
-    try{
-      const old = JSON.parse(raw) || [];
-      for(const e of old){ if(e && e.id && !Store.get(PFX+e.id)) await Store.set(PFX+e.id, JSON.stringify(e)); }
-      await Store.set('kupa:list', '');
-    }catch(e){}
-  })();
-  Store.onChange(render);
-  render();
 })();
 </script>
 <script>
