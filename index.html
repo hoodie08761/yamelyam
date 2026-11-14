@@ -2374,6 +2374,71 @@ function showToast(msg){
 })();
 </script>
 <script>
+/* ---------- shared expenses (kupa): one key per expense; balance = total paid per person ---------- */
+(function(){
+  const PFX = 'kupa:e:';
+  function fmt(c){ return (c/100).toFixed(2).replace(/\.00$/,'') + ' ₪'; }
+  function esc(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function getEntries(){
+    return Object.keys(Store.cache).filter(k=>k.startsWith(PFX)).map(k=>Store.get(k)).filter(Boolean)
+      .map(s=>{ try{ return JSON.parse(s); }catch(e){ return null; } }).filter(Boolean)
+      .sort((a,b)=>a.ts-b.ts);
+  }
+  function render(){
+    const list = getEntries();
+    const balEl = document.getElementById('kpBalance');
+    const listEl = document.getElementById('kpList');
+    if(!list.length){
+      balEl.innerHTML = '<div class="kp-empty">עדיין אין הוצאות.</div>';
+      listEl.innerHTML = '';
+      return;
+    }
+    const paid = {}; let total = 0;
+    list.forEach(e=>{ paid[e.payer] = (paid[e.payer]||0) + e.cents; total += e.cents; });
+    const rows = Object.keys(paid).sort((a,b)=>paid[b]-paid[a]).map(n=>
+      '<div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--line);"><span>'+esc(n)+'</span><b>'+fmt(paid[n])+'</b></div>'
+    ).join('');
+    balEl.innerHTML = '<div style="font-weight:800; margin-bottom:4px;">כמה שילם כל אחד</div>' + rows +
+      '<div style="display:flex; justify-content:space-between; padding-top:8px; font-weight:800;"><span>סה״כ</span><span>'+fmt(total)+'</span></div>';
+    listEl.innerHTML = list.slice().reverse().map(e=>
+      '<div class="kp-item"><div><b>'+esc(e.payer)+'</b> שילם <b>'+fmt(e.cents)+'</b> — '+esc(e.what||'ללא תיאור')+'</div>'+
+      '<button class="kp-del" onclick="kupaDelete(\''+e.id+'\')" aria-label="מחק">🗑️</button></div>'
+    ).join('');
+  }
+  window.kupaAdd = async function(){
+    const payer = document.getElementById('kpPayer').value.trim();
+    const amount = parseFloat(document.getElementById('kpAmount').value);
+    const what = document.getElementById('kpWhat').value.trim();
+    if(!payer){ showToast('כתוב מי שילם'); return; }
+    if(!(amount>0)){ showToast('כתוב סכום גדול מ-0'); return; }
+    const entry = {id: Date.now().toString(36)+Math.random().toString(36).slice(2,6), payer, cents: Math.round(amount*100), what, ts: Date.now()};
+    await Store.set(PFX+entry.id, JSON.stringify(entry));
+    document.getElementById('kpAmount').value=''; document.getElementById('kpWhat').value='';
+    showToast('ההוצאה נוספה 💸');
+    render();
+  };
+  window.kupaDelete = async function(id){
+    if(!confirm('למחוק את ההוצאה?')) return;
+    await Store.set(PFX+id, '');
+    showToast('ההוצאה נמחקה');
+    render();
+  };
+  // migrate the earlier single-list version, if it exists
+  (async function migrate(){
+    const raw = Store.get('kupa:list');
+    if(!raw) return;
+    try{
+      const old = JSON.parse(raw) || [];
+      for(const e of old){ if(e && e.id && !Store.get(PFX+e.id)) await Store.set(PFX+e.id, JSON.stringify(e)); }
+      await Store.set('kupa:list', '');
+    }catch(e){}
+  })();
+  Store.onChange(render);
+  render();
+})();
+</script>
+
+<script>
   // בדיקה אם הדפדפן (כמו ספארי באייפון) תומך ב-Service Worker
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
